@@ -1,0 +1,26 @@
+
+var appName = "Grid Tie";
+var emailUserName = "Email or user name";
+var password = "Password";
+var checkInternetConnection = "Please check your internet connection and try again!";
+var login = "Login";
+var emailNameValidation = "Please enter email or user name first!";
+var passwordValidation = "Please enter password first!";
+var home = "Home";
+var plant = "Plant";
+var alert = "Alert";
+var profile = "Profile";
+var currentPower = "Current Power";
+var dailyRevenue = "Daily Revenue";
+var totalEnergy = "Total Energy";
+var totalIncome = "Total Income";
+var activePlants = "Active Plants";
+var carbonOffset = "Carbon offset";
+var pageRefreshed = "Page Refreshed";
+var noDataFound ="No data found";
+var plantDetail = "Plant Detail";
+var day = "Day";
+var month = "Month";
+var year = "Year";
+var peakPower = "Peak Power";
+var confirm = "confirm";
