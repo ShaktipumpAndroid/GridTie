@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const PlantDetailPage(),
+      home: const LoginPage(),
     );
   }
 }
@@ -174,7 +174,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> signIn() async {
 
-   /* Utility().checkInternetConnection().then((connectionResult) {
+    Utility().checkInternetConnection().then((connectionResult) {
       if(connectionResult){
         if(emailUserNameController.text.toString().isEmpty){
           Utility().showInSnackBar(
@@ -197,11 +197,8 @@ class _LoginPageState extends State<LoginPage> {
             context: context);
       }
 
-    });*/
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-            builder: (BuildContext context) => const HomePage()),
-            (Route<dynamic> route) => false);
+    });
+
    }
 
 }

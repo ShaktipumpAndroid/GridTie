@@ -173,7 +173,7 @@ class _DayWidgetState extends State<DayWidget> {
       titleStyle: const TextStyle(
         fontWeight: FontWeight.w800,
         fontSize: 18,
-        color: Colors.white,
+        color: AppColor.themeColor,
       ),
       onSubmit: (index) {
         print(index);
@@ -191,15 +191,15 @@ class _DayWidgetState extends State<DayWidget> {
       },
       buttonText: confirm.toUpperCase(),
       buttonTextStyle: const TextStyle(
-          color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+          color: AppColor.whiteColor, fontSize: 14, fontWeight: FontWeight.w800),
       pickerTextStyle: const TextStyle(
-        color: Colors.white,
+        color: AppColor.themeColor,
         fontSize: 16,
         fontWeight: FontWeight.w600,
       ),
-      closeIconColor: AppColor.whiteColor,
-      buttonSingleColor: Colors.green,
-      backgroundColor: AppColor.themeColor,
+      closeIconColor: AppColor.themeColor,
+      buttonSingleColor: AppColor.themeColor,
+      backgroundColor: AppColor.whiteColor,
       initialDateTime: SelectedDate,
       minDateTime: DateTime(2023, 1, 1),
       maxDateTime: DateTime.now(),
