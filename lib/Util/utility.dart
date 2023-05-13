@@ -3,6 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../webservice/constant.dart';
 
 class Utility {
 
@@ -51,5 +54,14 @@ class Utility {
       date = myDate;
     }
     return date;
+  }
+  Future<String> isUserLogin() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if(sharedPreferences.get(userID)!=null && sharedPreferences.get(userID).toString().isNotEmpty){
+     return "true";
+
+    }else{
+      return "false";
+    }
   }
 }

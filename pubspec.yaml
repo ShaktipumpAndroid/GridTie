@@ -41,6 +41,10 @@ dependencies:
   bottom_picker: ^2.0.1
   date_format: ^2.0.5
   intl: ^0.17.0
+  http: any
+  shared_preferences: any
+  fluttertoast: ^8.0.9
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -65,6 +69,7 @@ flutter:
   assets:
     - assets/font/
     - assets/svg/
+    - assets/images/
   fonts:
     - family: Roboto
       fonts:

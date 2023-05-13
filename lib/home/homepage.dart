@@ -6,6 +6,7 @@ import '../bottom_navigation/alert/alertPage.dart';
 import '../bottom_navigation/dashboard/dashboardPage.dart';
 import '../bottom_navigation/plant/plantPage.dart';
 import '../bottom_navigation/profile/profilePage.dart';
+import '../login/model/userdetail.dart';
 import '../theme/color.dart';
 import '../theme/string.dart';
 
@@ -32,6 +33,7 @@ class _HomePageState extends State<HomePage> {
       super.setState(fn);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
