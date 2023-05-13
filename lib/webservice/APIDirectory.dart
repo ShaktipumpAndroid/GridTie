@@ -14,20 +14,26 @@ const deployedLambdaUrl = "https://solar10.shaktisolarrms.com//ShaktiGridTieInve
 
 getBaseURL() {
   String baseUrl = deployedLambdaUrl;
-    /*if (kIsWeb) {
+    if (kIsWeb) {
       print("1");
-      baseUrl = webBaseUrl;
+      baseUrl = deployedLambdaUrl;
     } else {
       print("2");
-      baseUrl = mobileBaseUrl;
+      baseUrl = deployedLambdaUrl;
 
-  }*/
+  }
   return baseUrl;
 }
 
 userLogin() {
-  return Uri.parse('${getBaseURL()}/gt_user/appIn');
+  return Uri.parse('${getBaseURL()}gt_user/appIn');
 }
 
 
+getDashboardDetails(String userId) {
+  return Uri.parse('${getBaseURL()}dashboard/list?userId=$userId');
+}
 
+getPlantList(String userId) {
+  return Uri.parse('${getBaseURL()}plant/list?userId=$userId');
+}

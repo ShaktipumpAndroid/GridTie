@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:grid_tie/bottom_navigation/dashboard/model/dashboardModel.dart';
 import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
+import 'dart:convert' as convert;
+import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import '../../Util/utility.dart';
 import '../../theme/string.dart';
+import '../../webservice/APIDirectory.dart';
+import '../../webservice/constant.dart';
 import 'model/chartdata.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -17,12 +22,15 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   late GlobalKey<ScaffoldState> _scaffoldKey;
+  bool isLoading = false;
+  String? currentPowerTxt="0",totalEnergyTxt="0",totalIncomeTxt="0",activePlantTxt="0",totalCapacityTxt="0";
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _scaffoldKey = GlobalKey();
+    dashBoardAPI();
   }
 
   @override
@@ -32,16 +40,13 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  final List<ChartData> chartData = [
-    ChartData('David', 75, AppColor.blue.shade300),
-    ChartData('David', 25, AppColor.themeColor),
-  ];
+   List<ChartData> chartData = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: RefreshIndicator(
-            child: Container(
+            child:Container(
               color: AppColor.whiteColor,
               child: Stack(children: <Widget>[
                 currentPowerWidget(),
@@ -74,8 +79,8 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Column(
         children: [
           pieChartWidget(),
-          const robotoTextWidget(
-              textval: '18.0387',
+           robotoTextWidget(
+              textval: currentPowerTxt.toString(),
               colorval: AppColor.whiteColor,
               sizeval: 40,
               fontWeight: FontWeight.bold),
@@ -194,8 +199,8 @@ class _DashboardPageState extends State<DashboardPage> {
                     const SizedBox(
                       height: 5,
                     ),
-                    const robotoTextWidget(
-                        textval: '198.28 kWh',
+                     robotoTextWidget(
+                        textval: totalEnergyTxt.toString(),
                         colorval: Colors.black,
                         sizeval: 22,
                         fontWeight: FontWeight.normal),
@@ -216,8 +221,8 @@ class _DashboardPageState extends State<DashboardPage> {
                     const SizedBox(
                       height: 5,
                     ),
-                    const robotoTextWidget(
-                        textval: '3978.78 USD',
+                     robotoTextWidget(
+                        textval: totalIncomeTxt.toString(),
                         colorval: Colors.black,
                         sizeval: 22,
                         fontWeight: FontWeight.normal),
@@ -243,8 +248,8 @@ class _DashboardPageState extends State<DashboardPage> {
                     const SizedBox(
                       height: 5,
                     ),
-                    const robotoTextWidget(
-                        textval: '20',
+                     robotoTextWidget(
+                        textval: activePlantTxt.toString(),
                         colorval: Colors.black,
                         sizeval: 22,
                         fontWeight: FontWeight.normal),
@@ -258,15 +263,15 @@ class _DashboardPageState extends State<DashboardPage> {
                 Column(
                   children: <Widget>[
                     robotoTextWidget(
-                        textval: carbonOffset,
+                        textval: totalCapacity,
                         colorval: AppColor.blue,
                         sizeval: 14,
                         fontWeight: FontWeight.bold),
                     const SizedBox(
                       height: 5,
                     ),
-                    const robotoTextWidget(
-                        textval: '19.83 Ton',
+                     robotoTextWidget(
+                        textval: totalCapacityTxt.toString(),
                         colorval: Colors.black,
                         sizeval: 22,
                         fontWeight: FontWeight.normal),
@@ -278,5 +283,48 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
     );
+  }
+
+  Future<void> dashBoardAPI() async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    dynamic res = await HTTP.get(getDashboardDetails('2'));
+    var jsonData = null;
+    if (res != null && res.statusCode != null && res.statusCode == 200) {
+
+
+
+        jsonData = convert.jsonDecode(res.body);
+        DashboardModel dashboardModel = DashboardModel.fromJson(jsonData);
+        if(dashboardModel.status.toString()=='true'){
+          print('response====>${dashboardModel.response.toString()}');
+          currentPowerTxt = dashboardModel.response.currentPower.toString();
+          totalEnergyTxt = dashboardModel.response.totalEnergy.toString();
+          totalIncomeTxt = '18.0387';
+          activePlantTxt = dashboardModel.response.onlinePlant.toString();
+          totalCapacityTxt = dashboardModel.response.totalCapacity.toString();
+        print('ActivePlant====>${dashboardModel.response.onlinePlant.toString()}');
+
+          //totalEnergyTxt,totalIncomeTxt,activePlantTxt,totalCapacityTxt
+          chartData = [
+            ChartData('David', dashboardModel.response.currentPower, AppColor.blue.shade300),
+
+          ];
+        }
+
+        setState(() {
+          isLoading = false;
+        });
+    } else {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 }

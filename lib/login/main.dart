@@ -1,9 +1,9 @@
 import 'dart:convert' as convert;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:grid_tie/Util/utility.dart';
-import 'package:grid_tie/login/model/userdetail.dart';
 import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/theme/string.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
@@ -198,21 +198,34 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> signIn() async {
-    Utility().checkInternetConnection().then((connectionResult) {
-      if (connectionResult) {
-        if (emailUserNameController.text.toString().isEmpty) {
-          Utility()
-              .showInSnackBar(value: emailNameValidation, context: context);
-        } else if (passwordController.text.toString().isEmpty) {
-          Utility().showInSnackBar(value: passwordValidation, context: context);
+    if (kIsWeb) {
+      loginmethod();
+    }else{
+      Utility().checkInternetConnection().then((connectionResult) {
+        if (connectionResult) {
+          loginmethod();
         } else {
-          loginAPI();
+          Utility()
+              .showInSnackBar(value: checkInternetConnection, context: context);
         }
-      } else {
-        Utility()
-            .showInSnackBar(value: checkInternetConnection, context: context);
-      }
-    });
+      });
+    }
+  }
+
+  void loginmethod() {
+    if (emailUserNameController.text
+        .toString()
+        .isEmpty) {
+      Utility()
+          .showInSnackBar(value: emailNameValidation, context: context);
+    } else if (passwordController.text
+        .toString()
+        .isEmpty) {
+      Utility().showInSnackBar(
+          value: passwordValidation, context: context);
+    } else {
+      loginAPI();
+    }
   }
 
   Future<void> loginAPI() async {
@@ -249,13 +262,6 @@ class _LoginPageState extends State<LoginPage> {
             userMobile, loginModel.response.mobile.toString());
         sharedPreferences.setString(
             userRoleId, loginModel.response.roleId.toString());
-
-        UserDetails.setUserId(loginModel.response.userId.toString());
-
-        UserDetails.setUserName(loginModel.response.userName.toString());
-        UserDetails.setUserEmail(loginModel.response.email.toString());
-        UserDetails.setUserMobile(loginModel.response.mobile.toString());
-        UserDetails.setUserRoleId(loginModel.response.roleId.toString());
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (BuildContext context) => const HomePage()),
@@ -267,22 +273,5 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> checkLoginStatus() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    print('userID====>${sharedPreferences.get(userID)}');
-    if (sharedPreferences.get(userID) != null &&
-        sharedPreferences.get(userID).toString().isNotEmpty) {
-      setState(() {
-        isScreenVisible = false;
-      });
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-              builder: (BuildContext context) => const HomePage()),
-          (Route<dynamic> route) => false);
-    } else {
-      setState(() {
-        isScreenVisible = true;
-      });
-    }
-  }
+
 }

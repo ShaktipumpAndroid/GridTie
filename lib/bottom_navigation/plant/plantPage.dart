@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:grid_tie/bottom_navigation/plant/model/plantlistmodel.dart';
 import 'package:grid_tie/bottom_navigation/plant/plantdetailwidget.dart';
-
+import 'package:grid_tie/webservice/HTTP.dart'as HTTP;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert' as convert;
 import '../../theme/color.dart';
 import '../../theme/string.dart';
 import '../../uiwidget/robotoTextWidget.dart';
+import '../../webservice/APIDirectory.dart';
+import '../../webservice/constant.dart';
 
 class PlantPage extends StatefulWidget {
   const PlantPage({Key? key}) : super(key: key);
@@ -14,13 +19,16 @@ class PlantPage extends StatefulWidget {
 }
 
 class _PlantPageState extends State<PlantPage> {
-  List<String> plantList = [
-    'Slitting Line 25Kw-2',
-    '5.5 Shakti Rooftop',
-    '16.5 HO RoofTop',
-    '3KW Manual',
-    '3 KW Taiwan AutoTracker'
-  ];
+
+  bool isLoading = false;
+  List<Response> plantList = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    plantListAPI();
+  }
 
   @override
   void setState(fn) {
@@ -32,7 +40,8 @@ class _PlantPageState extends State<PlantPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body:RefreshIndicator(
+        child: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
@@ -43,8 +52,17 @@ class _PlantPageState extends State<PlantPage> {
               stops: [0.2, 0.8],
             ),
           ),
-          child:_buildPosts(context)),
-    );
+          child:isLoading
+              ? const Center(
+            child: CircularProgressIndicator(),
+          ) : _buildPosts(context)),
+          onRefresh: () {
+            return Future.delayed(
+              const Duration(seconds: 3), () {
+               plantListAPI();
+              },
+            );
+          }));
   }
 
   Widget _buildPosts(BuildContext context) {
@@ -118,7 +136,7 @@ class _PlantPageState extends State<PlantPage> {
               width: 10,
             ),
             robotoTextWidget(
-              textval: plantList[index],
+              textval: plantList[index].plantName,
               colorval: AppColor.blackColor,
               sizeval: 14.0,
               fontWeight: FontWeight.w600,
@@ -127,5 +145,36 @@ class _PlantPageState extends State<PlantPage> {
         ),
       ),
     );
+  }
+
+  Future<void> plantListAPI() async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    dynamic res = await HTTP.get(getPlantList(sharedPreferences.getString(userID).toString()));
+    var jsonData = null;
+    if (res != null && res.statusCode != null && res.statusCode == 200) {
+
+
+
+      jsonData = convert.jsonDecode(res.body);
+      PlantListModel plantListModel = PlantListModel.fromJson(jsonData);
+      if(plantListModel.status.toString()=='true'){
+          plantList = plantListModel.response;
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 }

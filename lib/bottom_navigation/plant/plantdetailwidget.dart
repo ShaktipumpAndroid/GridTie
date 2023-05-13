@@ -161,7 +161,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                 Column(
                   children: <Widget>[
                     robotoTextWidget(
-                        textval: carbonOffset,
+                        textval: totalCapacity,
                         colorval: AppColor.blue,
                         sizeval: 14,
                         fontWeight: FontWeight.bold),
@@ -169,7 +169,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                       height: 5,
                     ),
                     const robotoTextWidget(
-                        textval: '19.83 Ton',
+                        textval: '195.0',
                         colorval: Colors.black,
                         sizeval: 22,
                         fontWeight: FontWeight.normal),
