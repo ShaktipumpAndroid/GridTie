@@ -10,10 +10,10 @@ import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../home/homepage.dart';
-import '../webservice/APIDirectory.dart';
-import '../webservice/constant.dart';
-import 'model/loginmodel.dart';
+import 'home/homepage.dart';
+import 'webservice/APIDirectory.dart';
+import 'webservice/constant.dart';
+import 'login/model/loginmodel.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -198,34 +198,28 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> signIn() async {
-    if (kIsWeb) {
-      loginmethod();
-    }else{
+
       Utility().checkInternetConnection().then((connectionResult) {
         if (connectionResult) {
-          loginmethod();
+          if (emailUserNameController.text
+              .toString()
+              .isEmpty) {
+            Utility()
+                .showInSnackBar(value: emailNameValidation, context: context);
+          } else if (passwordController.text
+              .toString()
+              .isEmpty) {
+            Utility().showInSnackBar(
+                value: passwordValidation, context: context);
+          } else {
+            loginAPI();
+          }
         } else {
           Utility()
               .showInSnackBar(value: checkInternetConnection, context: context);
         }
       });
-    }
-  }
 
-  void loginmethod() {
-    if (emailUserNameController.text
-        .toString()
-        .isEmpty) {
-      Utility()
-          .showInSnackBar(value: emailNameValidation, context: context);
-    } else if (passwordController.text
-        .toString()
-        .isEmpty) {
-      Utility().showInSnackBar(
-          value: passwordValidation, context: context);
-    } else {
-      loginAPI();
-    }
   }
 
   Future<void> loginAPI() async {

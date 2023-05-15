@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:grid_tie/Util/utility.dart';
-import 'package:grid_tie/login/main.dart';
+import 'package:grid_tie/main.dart';
 import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/theme/string.dart';
 import 'package:grid_tie/webservice/constant.dart';

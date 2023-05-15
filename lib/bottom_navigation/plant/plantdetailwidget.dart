@@ -25,12 +25,12 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
-      physics: AlwaysScrollableScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
       child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            ChartWidget(),
+            const ChartWidget(),
             plantDetailWidget(),
             solarHouseDetailWidget(),
           ]),
@@ -42,31 +42,34 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height / 3,
       child: Stack(children: <Widget>[
-        SvgPicture.asset(
-          'assets/svg/solarhouseplant.svg',
+       /* SvgPicture.asset('assets/svg/solarhouseplant.svg',
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height / 3,
 
-        ),
+        ),*/
+        Image.asset('assets/images/solarplant.jpg',
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height / 3,
+        fit: BoxFit.fill,),
         Container(
-          margin: EdgeInsets.only(bottom: 20,left: 10),
+          margin: const EdgeInsets.only(bottom: 20,left: 10),
           child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 robotoTextWidget(
                     textval: 'Capacity:- 25.0 kwp',
-                    colorval: Colors.greenAccent,
+                    colorval: AppColor.whiteColor,
                     sizeval: 18,
                     fontWeight: FontWeight.w600),
                 robotoTextWidget(
                     textval: 'Creation Time:- 2022-10-27',
-                    colorval:  Colors.greenAccent,
+                    colorval:  AppColor.whiteColor,
                     sizeval: 18,
                     fontWeight: FontWeight.w600),
                 robotoTextWidget(
                     textval: 'Address:- India, Sector 3, Pithampur',
-                    colorval:  Colors.greenAccent,
+                    colorval:  AppColor.whiteColor,
                     sizeval: 18,
                     fontWeight: FontWeight.w600)
               ]),

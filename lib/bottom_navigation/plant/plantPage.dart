@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:grid_tie/Util/utility.dart';
 import 'package:grid_tie/bottom_navigation/plant/model/plantlistmodel.dart';
 import 'package:grid_tie/bottom_navigation/plant/plantdetailwidget.dart';
 import 'package:grid_tie/webservice/HTTP.dart'as HTTP;
@@ -123,11 +124,7 @@ class _PlantPageState extends State<PlantPage> {
                   Positioned(
                     right: 0.0,
                     bottom: 0.0,
-                    child: SvgPicture.asset(
-                      'assets/svg/activedot.svg',
-                      width: 13,
-                      height: 13,
-                    ),
+                    child: plantList[index].status==true?loadSVG('assets/svg/activedot.svg'):loadSVG('assets/svg/deactivedot.svg'),
                   )
                 ],
               ),
@@ -176,5 +173,13 @@ class _PlantPageState extends State<PlantPage> {
         });
       }
     }
+  }
+
+  Widget loadSVG(String svg){
+    return SvgPicture.asset(
+      svg,
+      width: 13,
+      height: 13,
+    );
   }
 }

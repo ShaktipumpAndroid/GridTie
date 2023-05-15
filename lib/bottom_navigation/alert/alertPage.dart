@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:grid_tie/webservice/constant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:grid_tie/webservice/HTTP.dart'as HTTP;
+import 'dart:convert' as convert;
 import '../../theme/color.dart';
 import '../../theme/string.dart';
 import '../../uiwidget/robotoTextWidget.dart';
+import '../../webservice/APIDirectory.dart';
+import '../plant/model/plantlistmodel.dart';
+import '../plant/plantdetailwidget.dart';
 
 class AlertPage extends StatefulWidget {
   const AlertPage({Key? key}) : super(key: key);
@@ -14,8 +21,16 @@ class AlertPage extends StatefulWidget {
 }
 
 class _AlertPageState extends State<AlertPage> {
-  List<String> alertList = ['Slitting Line 25Kw-2',
-    '5.5 Shakti Rooftop','16.5 HO RoofTop'];
+
+  bool isLoading = false;
+  List<Response> alertList = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    alertListAPI();
+  }
 
   @override
   void setState(fn) {
@@ -27,29 +42,47 @@ class _AlertPageState extends State<AlertPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.themeColor,
-      body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.white, Colors.blue.shade800],
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-              stops: [0.2, 0.8],
-            ),
-          ),
-    child: _buildPosts(context)),
-    );
+        body:RefreshIndicator(
+            child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.white, Colors.blue.shade800],
+                    begin: Alignment.bottomLeft,
+                    end: Alignment.topRight,
+                    stops: [0.2, 0.8],
+                  ),
+                ),
+                child:isLoading
+                    ? const Center(
+                  child: CircularProgressIndicator(),
+                ) : _buildPosts(context)),
+            onRefresh: () {
+              return Future.delayed(
+                const Duration(seconds: 3), () {
+                alertListAPI();
+              },
+              );
+            }));
   }
+
   Widget _buildPosts(BuildContext context) {
     if (alertList.isEmpty) {
-      return  Center(child: robotoTextWidget(textval: noDataFound,colorval: AppColor.whiteColor,
-        sizeval: 18,fontWeight: FontWeight.w600,));
+      return Center(
+          child: robotoTextWidget(
+            textval: noDataFound,
+            colorval: AppColor.whiteColor,
+            sizeval: 18,
+            fontWeight: FontWeight.w600,
+          ));
     }
     return InkWell(
         onTap: () {
-          //onSelectTripDetailPage(context);
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => const PlantDetailPage()),
+                  (Route<dynamic> route) => true);
         },
         child: Container(
           margin: EdgeInsets.only(top: 40),
@@ -63,21 +96,21 @@ class _AlertPageState extends State<AlertPage> {
         ));
   }
 
-  Card ListItem(int index) {
-    return Card(
+  Widget ListItem(int index) {
+    return alertList[index].status==false?Card(
       color: AppColor.whiteColor,
       elevation: 10,
       semanticContainer: true,
       clipBehavior: Clip.antiAliasWithSaveLayer,
-      shape:  const RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         side: BorderSide(
           color: AppColor.greyBorder,
         ),
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
-      child:  Container(
-        height: MediaQuery.of(context).size.height/13,
-        padding: EdgeInsets.all(10),
+      child: Container(
+        height: MediaQuery.of(context).size.height / 13,
+        padding: const EdgeInsets.all(10),
         child: Row(
           children: [
             Align(
@@ -92,13 +125,7 @@ class _AlertPageState extends State<AlertPage> {
                   Positioned(
                     right: 0.0,
                     bottom: 0.0,
-                    child:
-                    SvgPicture.asset(
-                      'assets/svg/deactivedot.svg',
-                      width: 13,
-                      height: 13,
-                    ),
-
+                    child: alertList[index].status==false?loadSVG('assets/svg/deactivedot.svg'):loadSVG('assets/svg/deactivedot.svg'),
                   )
                 ],
               ),
@@ -107,14 +134,50 @@ class _AlertPageState extends State<AlertPage> {
               width: 10,
             ),
             robotoTextWidget(
-              textval: alertList[index],
+              textval: alertList[index].plantName,
               colorval: AppColor.blackColor,
               sizeval: 14.0,
               fontWeight: FontWeight.w600,
             ),
           ],
         ),
-      ),);
+      ),
+    ):const SizedBox(height: 0,width: 0,);
+  }
+
+  Future<void> alertListAPI() async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    dynamic res = await HTTP.get(getPlantList(sharedPreferences.getString(userID).toString()));
+    var jsonData = null;
+    if (res != null && res.statusCode != null && res.statusCode == 200) {
+      jsonData = convert.jsonDecode(res.body);
+      PlantListModel alertListModel = PlantListModel.fromJson(jsonData);
+      if(alertListModel.status.toString()=='true'){
+        alertList = alertListModel.response;
+      }
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  SvgPicture loadSVG(String svg){
+    return SvgPicture.asset(
+      svg,
+      width: 13,
+      height: 13,
+    );
   }
 
 

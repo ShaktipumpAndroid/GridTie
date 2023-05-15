@@ -10,7 +10,7 @@ const mobileHost = '192.168.29.211';
 const webBaseUrl = '$scheme://$host:$port';
 const mobileBaseUrl = '$scheme://$mobileHost:$port';
 
-const deployedLambdaUrl = "https://solar10.shaktisolarrms.com//ShaktiGridTieInverter/";
+const deployedLambdaUrl = "https://solar10.shaktisolarrms.com/ShaktiGridTieInverter/";
 
 getBaseURL() {
   String baseUrl = deployedLambdaUrl;
