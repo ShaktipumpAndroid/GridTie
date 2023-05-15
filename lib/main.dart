@@ -170,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
           child: TextField(
             controller: passwordController,
             maxLines: 1,
-            maxLength: 10,
+            maxLength: 30,
             obscureText: !isPasswordVisible,
             decoration: InputDecoration(
               hintText: password,
@@ -237,6 +237,7 @@ class _LoginPageState extends State<LoginPage> {
     dynamic response = await HTTP.post(userLogin(), data);
     print(response.statusCode);
     if (response != null && response.statusCode == 200) {
+      print("response==============>${response.body.toString()}");
       setState(() {
         isLoading = false;
       });
@@ -245,21 +246,23 @@ class _LoginPageState extends State<LoginPage> {
 
       LoginModel loginModel = LoginModel.fromJson(jsonData);
 
-      if (loginModel.status == true) {
+      if (loginModel.status == true && loginModel.response!=null) {
         sharedPreferences.setString(
-            userID, loginModel.response.userId.toString());
+            userID, loginModel.response!.userId.toString());
         sharedPreferences.setString(
-            userName, loginModel.response.userName.toString());
+            userName, loginModel.response!.userName.toString());
         sharedPreferences.setString(
-            userEmail, loginModel.response.email.toString());
+            userEmail, loginModel.response!.email.toString());
         sharedPreferences.setString(
-            userMobile, loginModel.response.mobile.toString());
+            userMobile, loginModel.response!.mobile.toString());
         sharedPreferences.setString(
-            userRoleId, loginModel.response.roleId.toString());
+            userRoleId, loginModel.response!.roleId.toString());
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (BuildContext context) => const HomePage()),
             (Route<dynamic> route) => false);
+      }else{
+        Utility().showInSnackBar(value: loginModel.message, context: context);
       }
     } else {
       if (!mounted) return;

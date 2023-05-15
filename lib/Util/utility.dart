@@ -7,6 +7,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../theme/color.dart';
+import '../theme/string.dart';
+import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/constant.dart';
 
 class Utility {
@@ -66,8 +69,6 @@ class Utility {
       return "false";
     }
   }
-
-
 
   void showToast(String toast_msg) {
     Fluttertoast.showToast(

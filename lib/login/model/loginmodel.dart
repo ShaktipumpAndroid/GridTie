@@ -9,26 +9,31 @@ LoginModel loginModelFromJson(String str) => LoginModel.fromJson(json.decode(str
 String loginModelToJson(LoginModel data) => json.encode(data.toJson());
 
 class LoginModel {
-  bool status;
-  String message;
-  Response response;
 
   LoginModel({
     required this.status,
     required this.message,
     required this.response,
   });
+  bool status;
+  String message;
+  Response? response;
+
+
 
   factory LoginModel.fromJson(Map<String, dynamic> json) => LoginModel(
     status: json["status"],
     message: json["message"],
-    response: Response.fromJson(json["response"] ?? {}),
+    response: json["response"] != null
+        ? Response.fromJson(json["response"])
+        : null,
+
   );
 
   Map<String, dynamic> toJson() => {
     "status": status,
     "message": message,
-    "response": response.toJson(),
+    "response": response!.toJson(),
   };
 }
 
@@ -66,20 +71,20 @@ class Response {
   });
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
-    userId: json["userId"],
-    userName: json["userName"],
-    userPass: json["userPass"],
-    email: json["email"],
-    mobile: json["mobile"],
-    firstName: json["firstName"],
-    middleName: json["middleName"],
-    lastName: json["lastName"],
-    createdDate: json["createdDate"],
-    status: json["status"],
-    parentId: json["parentId"],
-    roleId: json["roleId"],
-    address: json["address"],
-    createdBy: json["createdBy"],
+    userId: json["userId"] ?? "",
+    userName: json["userName"] ?? "",
+    userPass: json["userPass"] ?? "",
+    email: json["email"] ?? "",
+    mobile: json["mobile"] ?? "",
+    firstName: json["firstName"] ?? "",
+    middleName: json["middleName"] ?? "",
+    lastName:json["lastName"] ?? "",
+    createdDate: json["createdDate"] ?? "",
+    status: json["status"] ?? "",
+    parentId: json["parentId"] ?? "",
+    roleId: json["roleId"] ?? "",
+    address: json["address"] ?? "",
+    createdBy: json["createdBy"] ?? "",
   );
 
   Map<String, dynamic> toJson() => {

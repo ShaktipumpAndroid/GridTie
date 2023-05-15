@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:grid_tie/webservice/HTTP.dart'as HTTP;
 import 'dart:convert' as convert;
+import '../../Util/utility.dart';
 import '../../theme/color.dart';
 import '../../theme/string.dart';
 import '../../uiwidget/robotoTextWidget.dart';
@@ -69,13 +70,7 @@ class _AlertPageState extends State<AlertPage> {
 
   Widget _buildPosts(BuildContext context) {
     if (alertList.isEmpty) {
-      return Center(
-          child: robotoTextWidget(
-            textval: noDataFound,
-            colorval: AppColor.whiteColor,
-            sizeval: 18,
-            fontWeight: FontWeight.w600,
-          ));
+      return NoDataFound();
     }
     return InkWell(
         onTap: () {
@@ -142,7 +137,7 @@ class _AlertPageState extends State<AlertPage> {
           ],
         ),
       ),
-    ):const SizedBox(height: 0,width: 0,);
+    ): NoDataFound();
   }
 
   Future<void> alertListAPI() async {
@@ -178,6 +173,31 @@ class _AlertPageState extends State<AlertPage> {
       width: 13,
       height: 13,
     );
+  }
+
+  SizedBox NoDataFound() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      child: Center(
+          child: Container(
+            height: MediaQuery.of(context).size.height/10,
+            width: MediaQuery.of(context).size.width,
+            margin: EdgeInsets.only(left: 20,right: 20),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: const [
+                  BoxShadow(
+                      color: Color.fromRGBO(30, 136, 229, .5),
+                      blurRadius: 20,
+                      offset: Offset(0, 10))
+                ]),
+            child: Align(alignment: Alignment.center,
+              child: robotoTextWidget(textval: noDataFound,
+                  colorval: AppColor.themeColor,
+                  sizeval: 14, fontWeight: FontWeight.bold),),
+          )),);
   }
 
 

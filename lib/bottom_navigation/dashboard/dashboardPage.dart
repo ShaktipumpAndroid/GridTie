@@ -292,7 +292,7 @@ class _DashboardPageState extends State<DashboardPage> {
       });
     }
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    dynamic res = await HTTP.get(getDashboardDetails('2'));
+    dynamic res = await HTTP.get(getDashboardDetails(sharedPreferences.getString(userID).toString()));
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
 
