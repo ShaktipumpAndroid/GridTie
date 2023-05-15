@@ -40,7 +40,10 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-   List<ChartData> chartData = [];
+   final List<ChartData> chartData = [
+  ChartData('David', 75, AppColor.blue.shade300),
+  ChartData('David', 25, AppColor.themeColor),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -310,10 +313,10 @@ class _DashboardPageState extends State<DashboardPage> {
         print('ActivePlant====>${dashboardModel.response.onlinePlant.toString()}');
 
           //totalEnergyTxt,totalIncomeTxt,activePlantTxt,totalCapacityTxt
-          chartData = [
+         /* chartData = [
             ChartData('David', dashboardModel.response.currentPower, AppColor.blue.shade300),
 
-          ];
+          ];*/
         }
 
         setState(() {

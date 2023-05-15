@@ -120,7 +120,7 @@ class _AlertPageState extends State<AlertPage> {
                   Positioned(
                     right: 0.0,
                     bottom: 0.0,
-                    child: alertList[index].status==false?loadSVG('assets/svg/deactivedot.svg'):loadSVG('assets/svg/deactivedot.svg'),
+                    child: alertList[index].status==true?loadSVG('assets/svg/activedot.svg'):loadSVG('assets/svg/deactivedot.svg'),
                   )
                 ],
               ),
@@ -137,7 +137,7 @@ class _AlertPageState extends State<AlertPage> {
           ],
         ),
       ),
-    ): NoDataFound();
+    ):Container(height: 0,width: 0,);
   }
 
   Future<void> alertListAPI() async {
@@ -153,6 +153,7 @@ class _AlertPageState extends State<AlertPage> {
       jsonData = convert.jsonDecode(res.body);
       PlantListModel alertListModel = PlantListModel.fromJson(jsonData);
       if(alertListModel.status.toString()=='true'){
+
         alertList = alertListModel.response;
       }
       setState(() {
