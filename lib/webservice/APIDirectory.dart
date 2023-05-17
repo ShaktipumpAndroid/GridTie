@@ -37,3 +37,6 @@ getDashboardDetails(String userId) {
 getPlantList(String userId) {
   return Uri.parse('${getBaseURL()}plant/list?userId=$userId');
 }
+getFaultList(String userId) {
+  return Uri.parse('${getBaseURL()}fault/list?userId=$userId');
+}

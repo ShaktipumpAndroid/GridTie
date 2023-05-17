@@ -41,8 +41,9 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
    final List<ChartData> chartData = [
-  ChartData('David', 75, AppColor.blue.shade300),
-  ChartData('David', 25, AppColor.themeColor),
+  ChartData('Current power', 75, AppColor.blue.shade300),
+  ChartData('Total energy', 25,  AppColor.themeColor),
+
   ];
 
   @override
@@ -110,7 +111,7 @@ class _DashboardPageState extends State<DashboardPage> {
           yValueMapper: (ChartData data, _) => data.y,
           dataLabelMapper: (ChartData data, _) => data.x,
 
-          //  dataLabelSettings: const DataLabelSettings(isVisible: true)
+           // dataLabelSettings: const DataLabelSettings(isVisible: true)
         )
       ]),
     );

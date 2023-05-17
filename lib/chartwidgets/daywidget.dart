@@ -19,7 +19,7 @@ class DayWidget extends StatefulWidget {
 class _DayWidgetState extends State<DayWidget> {
   late List<ChartData> data;
   late TooltipBehavior _tooltip;
-  String selectedDateText = "",changeDate ="";
+  String selectedDateText = "", changeDate = "";
   late DateTime SelectedDate, mindatime;
   String dateFormat = "dd/MM/yyyy";
 
@@ -40,7 +40,7 @@ class _DayWidgetState extends State<DayWidget> {
     var outputFormat = DateFormat(dateFormat);
     setState(() {
       selectedDateText = outputFormat.format(SelectedDate);
-      changeDate  = outputFormat.format(SelectedDate);
+      changeDate = outputFormat.format(SelectedDate);
     });
   }
 
@@ -90,15 +90,20 @@ class _DayWidgetState extends State<DayWidget> {
           IconButton(
             onPressed: () {
               DateTime date = SelectedDate.subtract(Duration(days: 1));
-              var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
-              SelectedDate = inputFormat.parse(
-                  "${DateFormat('yyyy-MM-dd').format(date)} ${DateFormat('HH:mm').format(date)}");
-              var outputFormat = DateFormat(dateFormat);
-              setState(() {
-                selectedDateText = outputFormat.format(SelectedDate);
-                changeDate = outputFormat.format(SelectedDate);
-              });
-              print('previousDate===>${selectedDateText}');
+              if (date.year > 2017) {
+                var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+                SelectedDate = inputFormat.parse(
+                    "${DateFormat('yyyy-MM-dd').format(date)} ${DateFormat('HH:mm').format(date)}");
+                var outputFormat = DateFormat(dateFormat);
+                setState(() {
+                  selectedDateText = outputFormat.format(SelectedDate);
+                  changeDate = outputFormat.format(SelectedDate);
+                });
+                print('previousDate===>${selectedDateText}');
+              }else{
+                Utility().showInSnackBar(
+                    value: 'Cant select past dates', context: context);
+              }
             },
             icon: const Icon(
               Icons.arrow_circle_left_sharp,
@@ -137,25 +142,17 @@ class _DayWidgetState extends State<DayWidget> {
           ),
           IconButton(
             onPressed: () {
-              DateTime date = SelectedDate.add(Duration(days: 1));
-              var inputFormat = DateFormat('dd/MM/yyyy');
-              SelectedDate =
-                  inputFormat.parse("${DateFormat('dd/MM/yyyy').format(date)}");
+              DateTime date = SelectedDate.subtract(Duration(days: 1));
+              var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+              SelectedDate = inputFormat.parse(
+                  "${DateFormat('yyyy-MM-dd').format(date)} ${DateFormat('HH:mm').format(date)}");
               var outputFormat = DateFormat(dateFormat);
-              changeDate = outputFormat.format(SelectedDate);
               setState(() {
-
-                if (Utility().dateConverter(changeDate.toString()) ==
-                    "Tomorrow") {
-                  Utility().showInSnackBar(value: 'Cant select future dates', context: context);
-                  changeDate = selectedDateText;
-                  SelectedDate = mindatime;
-                } else {
-                  selectedDateText = outputFormat.format(SelectedDate);
-                  print(selectedDateText);
-                }
+                selectedDateText = outputFormat.format(SelectedDate);
+                changeDate = outputFormat.format(SelectedDate);
               });
-              },
+              print('previousDate===>${selectedDateText}');
+            },
             icon: const Icon(
               Icons.arrow_circle_right_sharp,
               size: 30,
@@ -191,7 +188,9 @@ class _DayWidgetState extends State<DayWidget> {
       },
       buttonText: confirm.toUpperCase(),
       buttonTextStyle: const TextStyle(
-          color: AppColor.whiteColor, fontSize: 14, fontWeight: FontWeight.w800),
+          color: AppColor.whiteColor,
+          fontSize: 14,
+          fontWeight: FontWeight.w800),
       pickerTextStyle: const TextStyle(
         color: AppColor.themeColor,
         fontSize: 16,
@@ -201,7 +200,7 @@ class _DayWidgetState extends State<DayWidget> {
       buttonSingleColor: AppColor.themeColor,
       backgroundColor: AppColor.whiteColor,
       initialDateTime: SelectedDate,
-      minDateTime: DateTime(2023, 1, 1),
+      minDateTime: DateTime(2018, 1, 1),
       maxDateTime: DateTime.now(),
     ).show(context);
   }

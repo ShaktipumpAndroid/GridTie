@@ -1,28 +1,28 @@
+import 'dart:convert' as convert;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:grid_tie/bottom_navigation/alert/alertdetailwidget.dart';
+import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:grid_tie/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:grid_tie/webservice/HTTP.dart'as HTTP;
-import 'dart:convert' as convert;
 import '../../Util/utility.dart';
 import '../../theme/color.dart';
 import '../../theme/string.dart';
 import '../../uiwidget/robotoTextWidget.dart';
 import '../../webservice/APIDirectory.dart';
-import '../plant/model/plantlistmodel.dart';
 import '../plant/plantdetailwidget.dart';
+import 'model/falultmodel.dart';
 
 class AlertPage extends StatefulWidget {
   const AlertPage({Key? key}) : super(key: key);
-
 
   @override
   State<AlertPage> createState() => _AlertPageState();
 }
 
 class _AlertPageState extends State<AlertPage> {
-
   bool isLoading = false;
   List<Response> alertList = [];
 
@@ -43,7 +43,7 @@ class _AlertPageState extends State<AlertPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body:RefreshIndicator(
+        body: RefreshIndicator(
             child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
@@ -55,15 +55,17 @@ class _AlertPageState extends State<AlertPage> {
                     stops: [0.2, 0.8],
                   ),
                 ),
-                child:isLoading
+                child: isLoading
                     ? const Center(
-                  child: CircularProgressIndicator(),
-                ) : _buildPosts(context)),
+                        child: CircularProgressIndicator(),
+                      )
+                    : _buildPosts(context)),
             onRefresh: () {
               return Future.delayed(
-                const Duration(seconds: 3), () {
-                alertListAPI();
-              },
+                const Duration(seconds: 3),
+                () {
+                  alertListAPI();
+                },
               );
             }));
   }
@@ -72,72 +74,83 @@ class _AlertPageState extends State<AlertPage> {
     if (alertList.isEmpty) {
       return NoDataFound();
     }
-    return InkWell(
-        onTap: () {
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (BuildContext context) => const PlantDetailPage()),
-                  (Route<dynamic> route) => true);
+    return Container(
+      margin: EdgeInsets.only(top: 40),
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          return ListItem(index);
         },
-        child: Container(
-          margin: EdgeInsets.only(top: 40),
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return ListItem(index);
-            },
-            itemCount: alertList.length,
-            padding: const EdgeInsets.all(8),
-          ),
-        ));
+        itemCount: alertList.length,
+        padding: const EdgeInsets.all(8),
+      ),
+    );
   }
 
   Widget ListItem(int index) {
-    return alertList[index].status==false?Card(
-      color: AppColor.whiteColor,
-      elevation: 10,
-      semanticContainer: true,
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      shape: const RoundedRectangleBorder(
-        side: BorderSide(
-          color: AppColor.greyBorder,
-        ),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Container(
-        height: MediaQuery.of(context).size.height / 13,
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
+    return Container(
+        child: GestureDetector(
+            onTap: () {
+
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          AlertDetailsPage(
+                            alertList: alertList[index],
+                          )),
+                      (Route<dynamic> route) => true);
+
+            },
+            child: Card(
+                color: AppColor.whiteColor,
+                elevation: 10,
+                semanticContainer: true,
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                shape: const RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: AppColor.greyBorder,
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                child: Container(
+                    alignment: Alignment.center,
+                    height: MediaQuery.of(context).size.height / 13,
+                    padding: const EdgeInsets.all(10),
+                    child: Stack(children: <Widget>[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Stack(
+                          children: <Widget>[
+                            SvgPicture.asset(
+                              'assets/svg/solartower.svg',
+                              width: 30,
+                              height: 30,
+                            ),
+                            Positioned(
+                              right: 0.0,
+                              bottom: 0.0,
+                              child: loadSVG('assets/svg/deactivedot.svg'),
+                            )
+                          ],
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Stack(
+                          children: <Widget>[
+                            faultDetail(index),
+                          ],
+                        ),
+                      ),
+
+                      /* Align(
+              alignment: Alignment.centerRight,
               child: Stack(
                 children: <Widget>[
-                  SvgPicture.asset(
-                    'assets/svg/solartower.svg',
-                    width: 30,
-                    height: 30,
-                  ),
-                  Positioned(
-                    right: 0.0,
-                    bottom: 0.0,
-                    child: alertList[index].status==true?loadSVG('assets/svg/activedot.svg'):loadSVG('assets/svg/deactivedot.svg'),
-                  )
+                 Icon(Icons.arrow_forward_ios_rounded,color: AppColor.grey,size: 15,)
                 ],
               ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            robotoTextWidget(
-              textval: alertList[index].plantName,
-              colorval: AppColor.blackColor,
-              sizeval: 14.0,
-              fontWeight: FontWeight.w600,
-            ),
-          ],
-        ),
-      ),
-    ):Container(height: 0,width: 0,);
+            )*/
+                    ])))));
   }
 
   Future<void> alertListAPI() async {
@@ -146,14 +159,14 @@ class _AlertPageState extends State<AlertPage> {
         isLoading = true;
       });
     }
-    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    dynamic res = await HTTP.get(getPlantList(sharedPreferences.getString(userID).toString()));
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    dynamic res = await HTTP.get(getFaultList('2'));
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
-      PlantListModel alertListModel = PlantListModel.fromJson(jsonData);
-      if(alertListModel.status.toString()=='true'){
-
+      FaultListModel alertListModel = FaultListModel.fromJson(jsonData);
+      if (alertListModel.status.toString() == 'true') {
         alertList = alertListModel.response;
       }
       setState(() {
@@ -168,7 +181,7 @@ class _AlertPageState extends State<AlertPage> {
     }
   }
 
-  SvgPicture loadSVG(String svg){
+  SvgPicture loadSVG(String svg) {
     return SvgPicture.asset(
       svg,
       width: 13,
@@ -182,24 +195,69 @@ class _AlertPageState extends State<AlertPage> {
       width: MediaQuery.of(context).size.width,
       child: Center(
           child: Container(
-            height: MediaQuery.of(context).size.height/10,
-            width: MediaQuery.of(context).size.width,
-            margin: EdgeInsets.only(left: 20,right: 20),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: const [
-                  BoxShadow(
-                      color: Color.fromRGBO(30, 136, 229, .5),
-                      blurRadius: 20,
-                      offset: Offset(0, 10))
-                ]),
-            child: Align(alignment: Alignment.center,
-              child: robotoTextWidget(textval: noDataFound,
-                  colorval: AppColor.themeColor,
-                  sizeval: 14, fontWeight: FontWeight.bold),),
-          )),);
+        height: MediaQuery.of(context).size.height / 10,
+        width: MediaQuery.of(context).size.width,
+        margin: EdgeInsets.only(left: 20, right: 20),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: const [
+              BoxShadow(
+                  color: Color.fromRGBO(30, 136, 229, .5),
+                  blurRadius: 20,
+                  offset: Offset(0, 10))
+            ]),
+        child: Align(
+          alignment: Alignment.center,
+          child: robotoTextWidget(
+              textval: noDataFound,
+              colorval: AppColor.themeColor,
+              sizeval: 14,
+              fontWeight: FontWeight.bold),
+        ),
+      )),
+    );
   }
 
-
+  Container faultDetail(int index) {
+    return Container(
+      margin: EdgeInsets.only(left: MediaQuery.of(context).size.width / 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                robotoTextWidget(
+                  textval: alertList[index].faultName,
+                  colorval: AppColor.themeColor,
+                  sizeval: 14.0,
+                  fontWeight: FontWeight.bold,
+                ),
+                robotoTextWidget(
+                  textval:
+                      '${Utility().changeDateFormate(alertList[index].date.toString())}',
+                  colorval: AppColor.blackColor,
+                  sizeval: 11.0,
+                  fontWeight: FontWeight.normal,
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          robotoTextWidget(
+            textval: 'Device No:- ${alertList[index].deviceNo}',
+            colorval: AppColor.blackColor,
+            sizeval: 12.0,
+            fontWeight: FontWeight.w400,
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:grid_tie/Util/utility.dart';
+import 'package:grid_tie/bottom_navigation/alert/alertdetailwidget.dart';
 import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/theme/string.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
@@ -199,9 +200,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> signIn() async {
 
-      Utility().checkInternetConnection().then((connectionResult) {
+    /*  Utility().checkInternetConnection().then((connectionResult) {
         if (connectionResult) {
-          if (emailUserNameController.text
+      */    if (emailUserNameController.text
               .toString()
               .isEmpty) {
             Utility()
@@ -214,11 +215,11 @@ class _LoginPageState extends State<LoginPage> {
           } else {
             loginAPI();
           }
-        } else {
+       /* } else {
           Utility()
               .showInSnackBar(value: checkInternetConnection, context: context);
         }
-      });
+      });*/
 
   }
 

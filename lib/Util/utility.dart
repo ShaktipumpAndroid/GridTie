@@ -38,14 +38,14 @@ class Utility {
      ),
    );
  }
-  String dateConverter(String myDate) {
+  String dateConverter(String myDate, int days) {
     String date;
     DateTime convertedDate =
     DateFormat("dd/MM/yyyy").parse(myDate.toString());
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final yesterday = DateTime(now.year, now.month, now.day - 1);
-    final tomorrow = DateTime(now.year, now.month, now.day + 1);
+    final yesterday = DateTime(now.year, now.month, now.day - days);
+    final tomorrow = DateTime(now.year, now.month, now.day + days);
 
     final dateToCheck = convertedDate;
     final checkDate = DateTime(dateToCheck.year, dateToCheck.month, dateToCheck.day);
@@ -60,6 +60,18 @@ class Utility {
     }
     return date;
   }
+
+
+  String changeDateFormate(String date) {
+    var inputFormat = DateFormat("yyyy-MM-dd HH:mm:ssZ");
+    var inputDate = inputFormat.parse(date); // <-- dd/MM 24H format
+
+    var outputFormat = DateFormat('dd MMM yyyy HH:mm a');
+    var outputDate = outputFormat.format(inputDate);
+
+    return outputDate;
+  }
+
   Future<String> isUserLogin() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if(sharedPreferences.get(userID)!=null && sharedPreferences.get(userID).toString().isNotEmpty){

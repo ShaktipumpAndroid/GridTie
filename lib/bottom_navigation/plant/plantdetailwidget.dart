@@ -42,11 +42,6 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height / 3,
       child: Stack(children: <Widget>[
-       /* SvgPicture.asset('assets/svg/solarhouseplant.svg',
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height / 3,
-
-        ),*/
         Image.asset('assets/images/solarplant.jpg',
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height / 3,
