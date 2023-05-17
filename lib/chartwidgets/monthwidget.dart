@@ -54,9 +54,9 @@ class _MonthWidgetState extends State<MonthWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
+        body:  Wrap(children: [Column(
       children: [datePickerWidget(), columnChart()],
-    ));
+    )]));
   }
 
   Container columnChart() {
@@ -81,8 +81,6 @@ class _MonthWidgetState extends State<MonthWidget> {
   datePickerWidget() {
     return Container(
       color: AppColor.grey,
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 20,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [

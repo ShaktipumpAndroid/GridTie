@@ -89,4 +89,12 @@ class Utility {
         toastLength: Toast.LENGTH_LONG,
         timeInSecForIosWeb: 9);
   }
+
+  String? calculateRevenue(String value){
+    final _volume;
+    final income = double.parse(value);
+    _volume = income * 6;
+    print(_volume);
+    return _volume.toStringAsFixed(2);
+  }
 }

@@ -52,12 +52,12 @@ class _YearWidgetState extends State<YearWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
+        body:  Wrap(children: [Column(
               children: [
                 datePickerWidget(),
                 columnChart()
               ],
-            ));
+            )]));
   }
   Container columnChart() {
     return Container(
@@ -80,8 +80,6 @@ class _YearWidgetState extends State<YearWidget> {
   datePickerWidget() {
     return Container(
       color: AppColor.grey,
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 20,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [

@@ -87,7 +87,7 @@ class _AlertPageState extends State<AlertPage> {
   }
 
   Widget ListItem(int index) {
-    return Container(
+    return  Wrap(children: [Container(
         child: GestureDetector(
             onTap: () {
 
@@ -111,9 +111,8 @@ class _AlertPageState extends State<AlertPage> {
                   ),
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                child: Container(
+                child:Container(
                     alignment: Alignment.center,
-                    height: MediaQuery.of(context).size.height / 13,
                     padding: const EdgeInsets.all(10),
                     child: Stack(children: <Widget>[
                       Align(
@@ -150,7 +149,7 @@ class _AlertPageState extends State<AlertPage> {
                 ],
               ),
             )*/
-                    ])))));
+                    ])))))]);
   }
 
   Future<void> alertListAPI() async {
@@ -161,7 +160,7 @@ class _AlertPageState extends State<AlertPage> {
     }
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
-    dynamic res = await HTTP.get(getFaultList('2'));
+    dynamic res = await HTTP.get(getFaultList(sharedPreferences.getString(userID).toString()));
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);

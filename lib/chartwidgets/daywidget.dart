@@ -54,9 +54,9 @@ class _DayWidgetState extends State<DayWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      children: [datePickerWidget(), areaChart()],
-    ));
+        body: Wrap(children: [Column(
+          children: [datePickerWidget(), areaChart()],
+        )],));
   }
 
   Container areaChart() {
@@ -66,7 +66,7 @@ class _DayWidgetState extends State<DayWidget> {
       margin: const EdgeInsets.only(left: 20, right: 20),
       child: SfCartesianChart(
           primaryXAxis: CategoryAxis(),
-          primaryYAxis: NumericAxis(minimum: 0, maximum: 40, interval: 10),
+          primaryYAxis: NumericAxis(minimum: 0, maximum: 30, interval: 5),
           tooltipBehavior: _tooltip,
           series: <ChartSeries<ChartData, String>>[
             AreaSeries<ChartData, String>(
@@ -82,8 +82,6 @@ class _DayWidgetState extends State<DayWidget> {
   datePickerWidget() {
     return Container(
       color: AppColor.grey,
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 20,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [

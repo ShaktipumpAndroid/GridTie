@@ -38,8 +38,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: pages[pageIndex],
-      bottomNavigationBar: Container(
-        height: MediaQuery.of(context).size.height/12,
+      bottomNavigationBar: Wrap(children: [Container(
         decoration: const BoxDecoration(
           color: AppColor.btnColor,
           borderRadius: BorderRadius.only(
@@ -123,7 +122,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-      ),
+      )],),
     );
   }
 

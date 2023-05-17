@@ -91,8 +91,8 @@ class _PlantPageState extends State<PlantPage> {
         ));
   }
 
-  Card ListItem(int index) {
-    return Card(
+  Wrap ListItem(int index) {
+    return Wrap(children: [Card(
       color: AppColor.whiteColor,
       elevation: 10,
       semanticContainer: true,
@@ -104,7 +104,6 @@ class _PlantPageState extends State<PlantPage> {
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: Container(
-          height: MediaQuery.of(context).size.height / 13,
           padding: const EdgeInsets.all(10),
           child: Stack(children: <Widget>[
             Row(
@@ -139,20 +138,9 @@ class _PlantPageState extends State<PlantPage> {
                 ),
               ],
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Stack(
-                children: const <Widget>[
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: AppColor.grey,
-                    size: 15,
-                  )
-                ],
-              ),
-            )
-          ])),
-    );
+
+          ]))
+    )]);
   }
 
   Future<void> plantListAPI() async {
