@@ -13,7 +13,7 @@ import '../../Util/utility.dart';
 import '../../theme/string.dart';
 import '../../webservice/APIDirectory.dart';
 import '../../webservice/constant.dart';
-import 'model/chartdata.dart';
+import '../../chartwidgets/model/chartdata.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -38,6 +38,7 @@ class _DashboardPageState extends State<DashboardPage> {
     super.initState();
     _scaffoldKey = GlobalKey();
     dashBoardAPI();
+
   }
 
   @override
@@ -47,10 +48,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  final List<ChartData> chartData = [
-    ChartData('Current power', 75, AppColor.themeColor),
-    ChartData('Total energy', 25, AppColor.themeColor),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +105,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Container(
       margin: const EdgeInsets.only(top: 70),
       height: MediaQuery.of(context).size.height / 8,
-      child: SfCircularChart(series: <CircularSeries>[
+      child: Container() /*SfCircularChart(series: <CircularSeries>[
         // Render pie chart
         PieSeries<ChartData, String>(
           dataSource: chartData,
@@ -119,7 +116,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
           // dataLabelSettings: const DataLabelSettings(isVisible: true)
         )
-      ]),
+      ]),*/
     );
   }
 
@@ -140,7 +137,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       blurRadius: 20,
                       offset: Offset(0, 10))
                 ]),
-            child: Row(
+            child:  Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
@@ -158,7 +155,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     Container(
                       margin:
-                          const EdgeInsets.only(top: 5, left: 20, bottom: 10),
+                      const EdgeInsets.only(top: 5, left: 20, bottom: 10),
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: robotoTextWidget(
@@ -232,7 +229,9 @@ class _DashboardPageState extends State<DashboardPage> {
   SizedBox detailBoxWidget(String title, String value) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.45,
-      child: Column(
+      child:  Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           robotoTextWidget(
               textval: title,

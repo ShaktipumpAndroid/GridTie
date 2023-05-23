@@ -12,7 +12,6 @@ import '../../theme/color.dart';
 import '../../theme/string.dart';
 import '../../uiwidget/robotoTextWidget.dart';
 import '../../webservice/APIDirectory.dart';
-import '../plant/plantdetailwidget.dart';
 import 'model/falultmodel.dart';
 
 class AlertPage extends StatefulWidget {
@@ -87,61 +86,59 @@ class _AlertPageState extends State<AlertPage> {
   }
 
   Widget ListItem(int index) {
-    return  Wrap(children: [Container(
-        child: GestureDetector(
-            onTap: () {
-
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          AlertDetailsPage(
-                            alertList: alertList[index],
-                          )),
-                      (Route<dynamic> route) => true);
-
-            },
-            child: Card(
-                color: AppColor.whiteColor,
-                elevation: 10,
-                semanticContainer: true,
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                shape: const RoundedRectangleBorder(
-                  side: BorderSide(
-                    color: AppColor.greyBorder,
+    return Wrap(children: [
+      Container(
+          child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => AlertDetailsPage(
+                              alertList: alertList[index],
+                            )),
+                    (Route<dynamic> route) => true);
+              },
+              child: Card(
+                  color: AppColor.whiteColor,
+                  elevation: 10,
+                  semanticContainer: true,
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  shape: const RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: AppColor.greyBorder,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child:Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.all(10),
-                    child: Stack(children: <Widget>[
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Stack(
-                          children: <Widget>[
-                            SvgPicture.asset(
-                              'assets/svg/solartower.svg',
-                              width: 30,
-                              height: 30,
-                            ),
-                            Positioned(
-                              right: 0.0,
-                              bottom: 0.0,
-                              child: loadSVG('assets/svg/deactivedot.svg'),
-                            )
-                          ],
+                  child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(10),
+                      child: Stack(children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Stack(
+                            children: <Widget>[
+                              SvgPicture.asset(
+                                'assets/svg/solartower.svg',
+                                width: 30,
+                                height: 30,
+                              ),
+                              Positioned(
+                                right: 0.0,
+                                bottom: 0.0,
+                                child: loadSVG('assets/svg/deactivedot.svg'),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Stack(
-                          children: <Widget>[
-                            faultDetail(index),
-                          ],
+                        Align(
+                          alignment: Alignment.center,
+                          child: Stack(
+                            children: <Widget>[
+                              faultDetail(index),
+                            ],
+                          ),
                         ),
-                      ),
 
-                      /* Align(
+                        /* Align(
               alignment: Alignment.centerRight,
               child: Stack(
                 children: <Widget>[
@@ -149,7 +146,8 @@ class _AlertPageState extends State<AlertPage> {
                 ],
               ),
             )*/
-                    ])))))]);
+                      ])))))
+    ]);
   }
 
   Future<void> alertListAPI() async {
@@ -160,7 +158,8 @@ class _AlertPageState extends State<AlertPage> {
     }
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
-    dynamic res = await HTTP.get(getFaultList(sharedPreferences.getString(userID).toString()));
+    dynamic res = await HTTP
+        .get(getFaultList(sharedPreferences.getString(userID).toString()));
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
@@ -226,15 +225,17 @@ class _AlertPageState extends State<AlertPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            margin: EdgeInsets.only(right: 20),
+            margin: EdgeInsets.only(right: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                robotoTextWidget(
-                  textval: alertList[index].faultName,
-                  colorval: AppColor.themeColor,
-                  sizeval: 14.0,
-                  fontWeight: FontWeight.bold,
+                Flexible(
+                  child: robotoTextWidget(
+                    textval: alertList[index].faultName.toString(),
+                    colorval: AppColor.themeColor,
+                    sizeval: 14.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 robotoTextWidget(
                   textval:

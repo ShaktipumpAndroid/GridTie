@@ -60,31 +60,11 @@ class _AlertDetailsPageState extends State<AlertDetailsPage> {
 
                 loadDetails('assets/svg/solarhouse.svg',widget.alertList!.plantName),
 
-                causeSolutionWidget(cause,causeDescription),
-                causeSolutionWidget(solution,solutionDescription),
-
+                causeSolutionWidget(cause,widget.alertList!.faultCause),
+                causeSolutionWidget(solution,widget.alertList!.faultSolution),
 
               ],
             ),
-            Align(alignment: Alignment.bottomCenter,
-            child:  GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-                child: Container(
-                  height: MediaQuery.of(context).size.height/18,
-                  margin:const EdgeInsets.only(bottom: 5,left: 10,right: 10),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColor.themeColor),
-                  child: Center(
-                    child: robotoTextWidget(
-                        textval: closeIssue,
-                        colorval: Colors.white,
-                        sizeval: 16,
-                        fontWeight: FontWeight.bold),
-                  ),
-                )),)
           ],) ,
         ));
   }

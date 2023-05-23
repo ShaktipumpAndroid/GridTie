@@ -2,35 +2,36 @@ import 'dart:convert' as convert;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:grid_tie/bottom_navigation/plant/device/DeviceListPage.dart';
-import 'package:grid_tie/bottom_navigation/plant/device/devicePage.dart';
-import 'package:grid_tie/bottom_navigation/plant/model/plantlistmodel.dart';
 import 'package:grid_tie/bottom_navigation/plant/device/devicedetailwidget.dart';
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../theme/color.dart';
-import '../../theme/string.dart';
-import '../../uiwidget/robotoTextWidget.dart';
-import '../../webservice/APIDirectory.dart';
-import '../../webservice/constant.dart';
+import '../../../theme/color.dart';
+import '../../../theme/string.dart';
+import '../../../uiwidget/robotoTextWidget.dart';
+import '../../../webservice/APIDirectory.dart';
+import '../../../webservice/constant.dart';
+import '../device/model/devicelistmodel.dart';
 
-class PlantPage extends StatefulWidget {
-  const PlantPage({Key? key}) : super(key: key);
+class DeviceListPage extends StatefulWidget {
+  String plantId, status;
+
+  DeviceListPage({Key? key, required this.plantId, required this.status})
+      : super(key: key);
 
   @override
-  State<PlantPage> createState() => _PlantPageState();
+  State<DeviceListPage> createState() => _DeviceListPageState();
 }
 
-class _PlantPageState extends State<PlantPage> {
+class _DeviceListPageState extends State<DeviceListPage> {
   bool isLoading = false;
-  List<Response> plantList = [];
+  List<Response> deviceList = [];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    plantListAPI();
+    deviceListAPI();
   }
 
   @override
@@ -64,37 +65,37 @@ class _PlantPageState extends State<PlantPage> {
               return Future.delayed(
                 const Duration(seconds: 3),
                 () {
-                  plantListAPI();
+                  deviceListAPI();
                 },
               );
             }));
   }
 
   Widget _buildPosts(BuildContext context) {
-    if (plantList.isEmpty) {
+    if (deviceList.isEmpty) {
       return NoDataFound();
     }
-    return  Container(
-          margin: EdgeInsets.only(top: 40),
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return ListItem(index);
-            },
-            itemCount: plantList.length,
-            padding: const EdgeInsets.all(8),
-          ),
-        );
+    return Container(
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          return ListItem(index);
+        },
+        itemCount: deviceList.length,
+        padding: const EdgeInsets.all(8),
+      ),
+    );
   }
 
   Wrap ListItem(int index) {
     return Wrap(children: [
-
       InkWell(
-        onTap: (){
+        onTap: () {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (BuildContext context) =>  DevicePage(plantId: plantList[index].pid.toString(),)),
-                  (Route<dynamic> route) => true);
+                  builder: (BuildContext context) => DeviceDetailPage(
+                        deviceId: deviceList[index].deviceNo.toString()
+                      )),
+              (Route<dynamic> route) => true);
         },
         child: Card(
             color: AppColor.whiteColor,
@@ -124,7 +125,7 @@ class _PlantPageState extends State<PlantPage> {
                             Positioned(
                               right: 0.0,
                               bottom: 0.0,
-                              child: plantList[index].status == true
+                              child: deviceList[index].status == "true"
                                   ? loadSVG('assets/svg/activedot.svg')
                                   : loadSVG('assets/svg/deactivedot.svg'),
                             )
@@ -134,21 +135,41 @@ class _PlantPageState extends State<PlantPage> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Flexible(child: robotoTextWidget(
-                        textval: plantList[index].plantName,
-                        colorval: AppColor.blackColor,
-                        sizeval: 14.0,
-                        fontWeight: FontWeight.w600,
-                      )),
+                      /*Flexible(
+                          child: robotoTextWidget(
+                            textval: deviceList[index].inverterType,
+                            colorval: AppColor.blackColor,
+                            sizeval: 12.0,
+                            fontWeight: FontWeight.w600,
+                          )),*/
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                           robotoTextWidget(
+                            textval: deviceList[index].inverterType,
+                            colorval: AppColor.blackColor,
+                            sizeval: 14.0,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                         robotoTextWidget(
+                            textval: deviceList[index].deviceNo,
+                            colorval: AppColor.blackColor,
+                            sizeval: 12.0,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ],
+                      )
                     ],
                   ),
-
-                ]))
-        ),
-      )]);
+                ]))),
+      )
+    ]);
   }
 
-  Future<void> plantListAPI() async {
+  Future<void> deviceListAPI() async {
     if (mounted) {
       setState(() {
         isLoading = true;
@@ -156,14 +177,16 @@ class _PlantPageState extends State<PlantPage> {
     }
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
-    dynamic res = await HTTP
-        .get(getPlantList(sharedPreferences.getString(userID).toString()));
+    dynamic res = await HTTP.get(getDeviceList(
+        sharedPreferences.getString(userID).toString(),
+        widget.status,
+        widget.plantId));
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
-      PlantListModel plantListModel = PlantListModel.fromJson(jsonData);
-      if (plantListModel.status.toString() == 'true') {
-        plantList = plantListModel.response;
+      DeviceListModel deviceListModel = DeviceListModel.fromJson(jsonData);
+      if (deviceListModel.status.toString() == 'true') {
+        deviceList = deviceListModel.response;
       }
 
       setState(() {
@@ -194,7 +217,7 @@ class _PlantPageState extends State<PlantPage> {
             child: Container(
           height: MediaQuery.of(context).size.height / 10,
           width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.only(left: 20, right: 20),
+          margin: const EdgeInsets.only(left: 20, right: 20),
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),

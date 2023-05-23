@@ -1,39 +1,48 @@
+import 'dart:convert' as convert;
+
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
+import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../Util/utility.dart';
-import '../bottom_navigation/dashboard/model/chartdata.dart';
 import '../theme/color.dart';
 import '../theme/string.dart';
+import '../webservice/APIDirectory.dart';
+import '../webservice/constant.dart';
+import 'model/chartdata.dart';
 
 class DayWidget extends StatefulWidget {
-  const DayWidget({Key? key}) : super(key: key);
+  DayWidget({Key? key, required this.deviceId}) : super(key: key);
+  String deviceId;
 
   @override
   State<DayWidget> createState() => _DayWidgetState();
 }
 
 class _DayWidgetState extends State<DayWidget> {
-  late List<ChartData> data;
+  late List<Response> data = [];
   late TooltipBehavior _tooltip;
-  String selectedDateText = "", changeDate = "";
+  String selectedDateText = "",
+      changeDate = "",
+      plantCapacity = "",
+      plantAddress = "",
+      currentPowerTxt = "",
+      totalEnergyTxt = "",
+      totalCapacityTxt = "",
+      totalIncomeTxt = "",
+      dailyRevenueTxt = "";
   late DateTime SelectedDate, mindatime;
-  String dateFormat = "dd/MM/yyyy";
+  String dateFormat = "yyyy-MM-dd", dateFormat2 = "yyyy-MM-dd";
+  bool isLoading = true;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    data = [
-      ChartData('CHN', 12, AppColor.themeColor),
-      ChartData('GER', 15, AppColor.themeColor),
-      ChartData('RUS', 18, AppColor.themeColor),
-      ChartData('BRZ', 6.4, AppColor.themeColor),
-      ChartData('IND', 14, AppColor.themeColor)
-    ];
     _tooltip = TooltipBehavior(enable: true);
     mindatime = DateTime.now();
     SelectedDate = mindatime;
@@ -42,6 +51,7 @@ class _DayWidgetState extends State<DayWidget> {
       selectedDateText = outputFormat.format(SelectedDate);
       changeDate = outputFormat.format(SelectedDate);
     });
+    dailyDataAPI();
   }
 
   @override
@@ -54,9 +64,19 @@ class _DayWidgetState extends State<DayWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Wrap(children: [Column(
-          children: [datePickerWidget(), areaChart()],
-        )],));
+        body: Stack(children: [
+      SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              datePickerWidget(),
+              areaChart(),
+              plantDetailWidget(),
+              solarHouseDetailWidget(),
+            ],
+          )),
+      isLoading ? Utility().dialogueWidget(context) : const SizedBox(),
+    ]));
   }
 
   Container areaChart() {
@@ -66,14 +86,15 @@ class _DayWidgetState extends State<DayWidget> {
       margin: const EdgeInsets.only(left: 20, right: 20),
       child: SfCartesianChart(
           primaryXAxis: CategoryAxis(),
-          primaryYAxis: NumericAxis(minimum: 0, maximum: 30, interval: 5),
+          primaryYAxis: NumericAxis(minimum: 0, maximum: 50, interval: 10),
           tooltipBehavior: _tooltip,
-          series: <ChartSeries<ChartData, String>>[
-            AreaSeries<ChartData, String>(
+          series: <ChartSeries<Response, String>>[
+            AreaSeries<Response, String>(
                 dataSource: data,
-                xValueMapper: (ChartData data, _) => data.x,
-                yValueMapper: (ChartData data, _) => data.y,
-                name: 'Gold',
+                xValueMapper: (Response data, _) =>
+                    Utility().changeTimeFormate1(data.date1),
+                yValueMapper: (Response data, _) => data.todayREnergy,
+                name: 'Peak Energy',
                 color: AppColor.themeColor)
           ]),
     );
@@ -96,9 +117,9 @@ class _DayWidgetState extends State<DayWidget> {
                 setState(() {
                   selectedDateText = outputFormat.format(SelectedDate);
                   changeDate = outputFormat.format(SelectedDate);
+                  dailyDataAPI();
                 });
-                print('previousDate===>${selectedDateText}');
-              }else{
+              } else {
                 Utility().showInSnackBar(
                     value: 'Cant select past dates', context: context);
               }
@@ -140,16 +161,24 @@ class _DayWidgetState extends State<DayWidget> {
           ),
           IconButton(
             onPressed: () {
-              DateTime date = SelectedDate.subtract(Duration(days: 1));
-              var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
-              SelectedDate = inputFormat.parse(
-                  "${DateFormat('yyyy-MM-dd').format(date)} ${DateFormat('HH:mm').format(date)}");
+              DateTime date = SelectedDate.add(Duration(days: 1));
+              var inputFormat = DateFormat('dd/MM/yyyy');
+              SelectedDate =
+                  inputFormat.parse("${DateFormat('dd/MM/yyyy').format(date)}");
               var outputFormat = DateFormat(dateFormat);
+              changeDate = outputFormat.format(SelectedDate);
               setState(() {
-                selectedDateText = outputFormat.format(SelectedDate);
-                changeDate = outputFormat.format(SelectedDate);
+                if (Utility().dateConverter(changeDate.toString(), 1) ==
+                    "Tomorrow") {
+                  Utility().showInSnackBar(
+                      value: 'Cant select future dates', context: context);
+                  changeDate = selectedDateText;
+                  SelectedDate = mindatime;
+                } else {
+                  selectedDateText = outputFormat.format(SelectedDate);
+                  dailyDataAPI();
+                }
               });
-              print('previousDate===>${selectedDateText}');
             },
             icon: const Icon(
               Icons.arrow_circle_right_sharp,
@@ -179,6 +208,7 @@ class _DayWidgetState extends State<DayWidget> {
         var outputFormat = DateFormat(dateFormat);
         setState(() {
           selectedDateText = outputFormat.format(SelectedDate);
+          dailyDataAPI();
         });
       },
       onClose: () {
@@ -201,5 +231,156 @@ class _DayWidgetState extends State<DayWidget> {
       minDateTime: DateTime(2018, 1, 1),
       maxDateTime: DateTime.now(),
     ).show(context);
+  }
+
+  SizedBox solarHouseDetailWidget() {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 3,
+      child: Stack(children: <Widget>[
+        Image.asset(
+          'assets/images/solarplant.jpg',
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height / 3,
+          fit: BoxFit.fill,
+        ),
+        Container(
+          margin: const EdgeInsets.only(bottom: 20, left: 10),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                robotoTextWidget(
+                    textval: 'Address:- $plantAddress',
+                    colorval: AppColor.whiteColor,
+                    sizeval: 12,
+                    fontWeight: FontWeight.w600)
+              ]),
+        )
+      ]),
+    );
+  }
+
+  Wrap plantDetailWidget() {
+    return Wrap(
+      children: [
+        Container(
+          margin: EdgeInsets.only(top: 20, bottom: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      detailBoxWidget(totalEnergy, totalEnergyTxt.toString()),
+                      lineWidget(),
+                      detailBoxWidget(totalIncome, totalIncomeTxt.toString()),
+                    ],
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                    height: 1,
+                    color: AppColor.grey,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      detailBoxWidget(currentPower, currentPowerTxt.toString()),
+                      lineWidget(),
+                      detailBoxWidget(dailyRevenue, dailyRevenueTxt.toString()),
+                    ],
+                  )
+                ],
+              )
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  SizedBox detailBoxWidget(String title, String value) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.45,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          robotoTextWidget(
+              textval: title,
+              colorval: AppColor.blue,
+              sizeval: 14,
+              fontWeight: FontWeight.bold),
+          const SizedBox(
+            height: 5,
+          ),
+          robotoTextWidget(
+              textval: value,
+              colorval: Colors.black,
+              sizeval: 16,
+              fontWeight: FontWeight.normal),
+        ],
+      ),
+    );
+  }
+
+  Container lineWidget() {
+    return Container(
+      width: 1,
+      height: MediaQuery.of(context).size.height / 8,
+      color: AppColor.grey,
+    );
+  }
+
+  Future<void> dailyDataAPI() async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    var outputFormat = DateFormat(dateFormat2);
+
+    dynamic res = await HTTP.get(getDailyDeviceChart(
+        sharedPreferences.getString(userID).toString(),
+        outputFormat.format(SelectedDate).toString(),
+        widget.deviceId));
+    var jsonData = null;
+    if (res != null && res.statusCode != null && res.statusCode == 200) {
+      jsonData = convert.jsonDecode(res.body);
+      ChartData chartData = ChartData.fromJson(jsonData);
+      if (chartData.status.toString() == 'true') {
+        data = chartData.response;
+        plantAddress = chartData.response[chartData.response.length - 1].address;
+
+        currentPowerTxt =
+            '${chartData.response[chartData.response.length - 1].currentRPower} kWh';
+
+        totalEnergyTxt =
+            '${chartData.response[chartData.response.length - 1].totalREnergy} kWh';
+        totalIncomeTxt =
+            '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy}').toString()} INR';
+
+        dailyRevenueTxt =
+            '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 }

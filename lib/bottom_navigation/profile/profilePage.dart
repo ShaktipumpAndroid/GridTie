@@ -80,6 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
     child: Container(
         width: 150,
         height: 150,
+
         margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height/3),
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(100)),
@@ -87,10 +88,9 @@ class _ProfilePageState extends State<ProfilePage> {
         child:  const Card(
             elevation: 10,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(100)),
-            ),
+              borderRadius: BorderRadius.all(Radius.circular(100)),),
             child: CircleAvatar(
-              backgroundImage: AssetImage('assets/images/profile_images.jpg'),
+              backgroundImage: AssetImage('assets/images/profile_images.jpg',),
 
             )
         )

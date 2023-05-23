@@ -2,6 +2,10 @@
 //
 //     final faultListModel = faultListModelFromJson(jsonString);
 
+// To parse this JSON data, do
+//
+//     final faultListModel = faultListModelFromJson(jsonString);
+
 import 'dart:convert';
 
 FaultListModel faultListModelFromJson(String str) => FaultListModel.fromJson(json.decode(str));
@@ -22,12 +26,15 @@ class FaultListModel {
   factory FaultListModel.fromJson(Map<String, dynamic> json) => FaultListModel(
     status: json["status"],
     message: json["message"],
-    response: List<Response>.from(json["response"].map((x) => Response.fromJson(x))),
+
+    response: json["response"]!=null?
+    List<Response>.from(json["response"].map((x) => Response.fromJson(x))):[],
   );
 
   Map<String, dynamic> toJson() => {
     "status": status,
     "message": message,
+
     "response": List<dynamic>.from(response.map((x) => x.toJson())),
   };
 }
@@ -35,6 +42,8 @@ class FaultListModel {
 class Response {
   String faultCode;
   String faultName;
+  String faultCause;
+  String faultSolution;
   DateTime date;
   String deviceNo;
   String faultBit;
@@ -45,6 +54,8 @@ class Response {
   Response({
     required this.faultCode,
     required this.faultName,
+    required this.faultCause,
+    required this.faultSolution,
     required this.date,
     required this.deviceNo,
     required this.faultBit,
@@ -56,6 +67,8 @@ class Response {
   factory Response.fromJson(Map<String, dynamic> json) => Response(
     faultCode: json["faultCode"],
     faultName: json["faultName"],
+    faultCause: json["faultCause"],
+    faultSolution: json["faultSolution"],
     date: DateTime.parse(json["date"]),
     deviceNo: json["deviceNo"],
     faultBit: json["faultBit"],
@@ -67,6 +80,8 @@ class Response {
   Map<String, dynamic> toJson() => {
     "faultCode": faultCode,
     "faultName": faultName,
+    "faultCause": faultCause,
+    "faultSolution": faultSolution,
     "date": date.toIso8601String(),
     "deviceNo": deviceNo,
     "faultBit": faultBit,

@@ -7,10 +7,11 @@ import 'package:grid_tie/theme/string.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../bottom_navigation/dashboard/model/chartdata.dart';
+import 'model/chartdata.dart';
 
 class ChartWidget extends StatefulWidget {
-  const ChartWidget({Key? key}) : super(key: key);
+   ChartWidget({Key? key,required this.deviceId}) : super(key: key);
+  String deviceId;
 
   @override
   State<ChartWidget> createState() => _ChartWidgetState();
@@ -28,7 +29,7 @@ class _ChartWidgetState extends State<ChartWidget> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height / 1.7,
+      height: MediaQuery.of(context).size.height,
       child: DefaultTabController(
         length: 3,
         child: Scaffold(
@@ -38,7 +39,7 @@ class _ChartWidgetState extends State<ChartWidget> {
                 onPressed: () => Navigator.of(context).pop(),
               ),
               backgroundColor: AppColor.themeColor,
-              title: robotoTextWidget(textval: plantDetail, colorval: AppColor.whiteColor,
+              title: robotoTextWidget(textval: deviceDetail, colorval: AppColor.whiteColor,
                   sizeval: 18, fontWeight: FontWeight.normal),
               bottom:  TabBar(
                 isScrollable: false,
@@ -50,12 +51,12 @@ class _ChartWidgetState extends State<ChartWidget> {
                   Tab(child: robotoTextWidget(textval: year, colorval: AppColor.whiteColor, sizeval: 14, fontWeight: FontWeight.normal)),
                 ],
               )),
-          body:  const TabBarView(
+          body:   TabBarView(
             physics: NeverScrollableScrollPhysics(),
             children: [
-             DayWidget(),
-              MonthWidget(),
-              YearWidget(),
+             DayWidget(deviceId: widget.deviceId,),
+              MonthWidget(deviceId: widget.deviceId ,),
+              YearWidget(deviceId: widget.deviceId,),
             ],
           ),
         ),

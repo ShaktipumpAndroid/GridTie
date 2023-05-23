@@ -15,7 +15,7 @@ class robotoTextWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return  Text(
       textval,
       textAlign: TextAlign.justify,
       overflow: TextOverflow.ellipsis,
@@ -28,3 +28,5 @@ class robotoTextWidget extends StatelessWidget {
     );
   }
 }
+/* Flexible(child: Text(description,style: const TextStyle(color: Colors.black,
+                fontSize: 12,fontWeight: FontWeight.normal),)),*/

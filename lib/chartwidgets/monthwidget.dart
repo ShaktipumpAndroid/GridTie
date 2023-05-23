@@ -1,47 +1,64 @@
+import 'dart:convert' as convert;
+
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:grid_tie/webservice/APIDirectory.dart';
+import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../Util/utility.dart';
-import '../bottom_navigation/dashboard/model/chartdata.dart';
 import '../theme/color.dart';
 import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
+import '../webservice/constant.dart';
+import 'model/chartdata.dart';
 
 class MonthWidget extends StatefulWidget {
-  const MonthWidget({Key? key}) : super(key: key);
+  MonthWidget({Key? key, required this.deviceId}) : super(key: key);
+  String deviceId;
 
   @override
   State<MonthWidget> createState() => _MonthWidgetState();
 }
 
 class _MonthWidgetState extends State<MonthWidget> {
-  late List<ChartData> data;
+  late List<Response> data = [];
   late TooltipBehavior _tooltip;
-  String selectedDateText = "", changeDate = "";
   late DateTime SelectedDate, mindatime;
-  String dateFormat = "dd/MM/yyyy";
+  bool isLoading = false;
+  String selectedDateText = "",
+      changeDate = "",
+      plantCapacity = "",
+      plantAddress = "",
+      currentPowerTxt = "",
+      totalEnergyTxt = "",
+      totalCapacityTxt = "",
+      totalIncomeTxt = "",
+      dailyRevenueTxt = "",
+      firstMonthDate = "",
+      lastMonthDate = "",
+      dateFormat = "yyyy-MM-dd",
+      dateFormat2 = "MM-yyyy";
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    data = [
-      ChartData('CHN', 12, AppColor.themeColor),
-      ChartData('GER', 15, AppColor.themeColor),
-      ChartData('RUS', 18, AppColor.themeColor),
-      ChartData('BRZ', 6.4, AppColor.themeColor),
-      ChartData('IND', 14, AppColor.themeColor)
-    ];
     _tooltip = TooltipBehavior(enable: true);
     mindatime = DateTime.now();
     SelectedDate = mindatime;
     var outputFormat = DateFormat(dateFormat);
     setState(() {
-      selectedDateText = outputFormat.format(SelectedDate);
+      selectedDateText = DateFormat(dateFormat2).format(SelectedDate);
       changeDate = outputFormat.format(SelectedDate);
+      firstMonthDate =
+          outputFormat.format(Utility().findFirstDateOfTheMonth(SelectedDate));
+      lastMonthDate =
+          outputFormat.format(Utility().findLastDateOfTheMonth(SelectedDate));
     });
+    monthDataAPI();
   }
 
   @override
@@ -54,9 +71,19 @@ class _MonthWidgetState extends State<MonthWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body:  Wrap(children: [Column(
-      children: [datePickerWidget(), columnChart()],
-    )]));
+        body: Stack(children: [
+      SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              datePickerWidget(),
+              columnChart(),
+              plantDetailWidget(),
+              solarHouseDetailWidget(),
+            ],
+          )),
+      isLoading ? Utility().dialogueWidget(context) : const SizedBox(),
+    ]));
   }
 
   Container columnChart() {
@@ -66,14 +93,15 @@ class _MonthWidgetState extends State<MonthWidget> {
         margin: const EdgeInsets.only(left: 20, right: 20),
         child: SfCartesianChart(
             primaryXAxis: CategoryAxis(),
-            primaryYAxis: NumericAxis(minimum: 0, maximum: 40, interval: 10),
+            primaryYAxis: NumericAxis(minimum: 0, maximum: 50, interval: 10),
             tooltipBehavior: _tooltip,
-            series: <ChartSeries<ChartData, String>>[
-              ColumnSeries<ChartData, String>(
+            series: <ChartSeries<Response, String>>[
+              ColumnSeries<Response, String>(
                   dataSource: data,
-                  xValueMapper: (ChartData data, _) => data.x,
-                  yValueMapper: (ChartData data, _) => data.y,
-                  name: 'Gold',
+                  xValueMapper: (Response data, _) =>
+                      Utility().changeMonthFormate(data.date1),
+                  yValueMapper: (Response data, _) => data.todayREnergy,
+                  name: 'Peak Energy',
                   color: AppColor.themeColor)
             ]));
   }
@@ -93,10 +121,16 @@ class _MonthWidgetState extends State<MonthWidget> {
                     "${DateFormat('yyyy-MM-dd').format(date)} ${DateFormat('HH:mm').format(date)}");
                 var outputFormat = DateFormat(dateFormat);
                 setState(() {
-                  selectedDateText = outputFormat.format(SelectedDate);
+                  selectedDateText =
+                      DateFormat(dateFormat2).format(SelectedDate);
                   changeDate = outputFormat.format(SelectedDate);
+                  firstMonthDate = outputFormat
+                      .format(Utility().findFirstDateOfTheMonth(SelectedDate));
+                  lastMonthDate = outputFormat
+                      .format(Utility().findLastDateOfTheMonth(SelectedDate));
                 });
-                print('previousDate===>${selectedDateText}');
+
+                monthDataAPI();
               } else {
                 Utility().showInSnackBar(
                     value: 'Cant select past months', context: context);
@@ -110,7 +144,7 @@ class _MonthWidgetState extends State<MonthWidget> {
           ),
           GestureDetector(
             onTap: () {
-               _openDatePicker(context);
+              //   _openDatePicker(context);
             },
             child: Container(
               width: 150,
@@ -140,9 +174,9 @@ class _MonthWidgetState extends State<MonthWidget> {
           IconButton(
             onPressed: () {
               DateTime date = SelectedDate.add(Duration(days: 30));
-              var inputFormat = DateFormat('dd/MM/yyyy');
+              var inputFormat = DateFormat('yyyy-MM-dd');
               SelectedDate =
-                  inputFormat.parse("${DateFormat('dd/MM/yyyy').format(date)}");
+                  inputFormat.parse("${DateFormat('yyyy-MM-dd').format(date)}");
               var outputFormat = DateFormat(dateFormat);
               changeDate = outputFormat.format(SelectedDate);
               setState(() {
@@ -150,11 +184,20 @@ class _MonthWidgetState extends State<MonthWidget> {
                     "Tomorrow") {
                   Utility().showInSnackBar(
                       value: 'Cant select future months', context: context);
-                  changeDate = selectedDateText;
+                  changeDate = outputFormat.format(DateTime.now());
                   SelectedDate = mindatime;
+                  firstMonthDate = outputFormat
+                      .format(Utility().findFirstDateOfTheMonth(mindatime));
+                  lastMonthDate = outputFormat
+                      .format(Utility().findLastDateOfTheMonth(mindatime));
                 } else {
-                  selectedDateText = outputFormat.format(SelectedDate);
-                  print(selectedDateText);
+                  selectedDateText =
+                      DateFormat(dateFormat2).format(SelectedDate);
+                  firstMonthDate = outputFormat
+                      .format(Utility().findFirstDateOfTheMonth(SelectedDate));
+                  lastMonthDate = outputFormat
+                      .format(Utility().findLastDateOfTheMonth(SelectedDate));
+                  monthDataAPI();
                 }
               });
             },
@@ -183,7 +226,7 @@ class _MonthWidgetState extends State<MonthWidget> {
         var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
         SelectedDate = inputFormat.parse(
             "${DateFormat('yyyy-MM-dd').format(index)} ${DateFormat('HH:mm').format(SelectedDate)}");
-        var outputFormat = DateFormat(dateFormat);
+        var outputFormat = DateFormat(dateFormat2);
         setState(() {
           selectedDateText = outputFormat.format(SelectedDate);
         });
@@ -208,5 +251,163 @@ class _MonthWidgetState extends State<MonthWidget> {
       minDateTime: DateTime(2018, 1, 1),
       maxDateTime: DateTime.now(),
     ).show(context);
+  }
+
+  SizedBox solarHouseDetailWidget() {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 3,
+      child: Stack(children: <Widget>[
+        Image.asset(
+          'assets/images/solarplant.jpg',
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height / 3,
+          fit: BoxFit.fill,
+        ),
+        Container(
+          margin: const EdgeInsets.only(bottom: 20, left: 10),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                robotoTextWidget(
+                    textval: plantAddress.trim(),
+                    colorval: AppColor.whiteColor,
+                    sizeval: 12,
+                    fontWeight: FontWeight.w600)
+              ]),
+        )
+      ]),
+    );
+  }
+
+  Wrap plantDetailWidget() {
+    return Wrap(
+      children: [
+        Container(
+          margin: EdgeInsets.only(top: 20, bottom: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      detailBoxWidget(totalEnergy, totalEnergyTxt.toString()),
+                      lineWidget(),
+                      detailBoxWidget(totalIncome, totalIncomeTxt.toString()),
+                    ],
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                    height: 1,
+                    color: AppColor.grey,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      detailBoxWidget(currentPower, currentPowerTxt.toString()),
+                      lineWidget(),
+                      detailBoxWidget(dailyRevenue, dailyRevenueTxt.toString()),
+                    ],
+                  )
+                ],
+              )
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  SizedBox detailBoxWidget(String title, String value) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.45,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          robotoTextWidget(
+              textval: title,
+              colorval: AppColor.blue,
+              sizeval: 14,
+              fontWeight: FontWeight.bold),
+          const SizedBox(
+            height: 5,
+          ),
+          robotoTextWidget(
+              textval: value,
+              colorval: Colors.black,
+              sizeval: 16,
+              fontWeight: FontWeight.normal),
+        ],
+      ),
+    );
+  }
+
+  Container lineWidget() {
+    return Container(
+      width: 1,
+      height: MediaQuery.of(context).size.height / 8,
+      color: AppColor.grey,
+    );
+  }
+
+  Future<void> monthDataAPI() async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    var outputFormat = DateFormat(dateFormat2);
+
+    dynamic res = await HTTP.get(getMonthlyDeviceChart(
+        sharedPreferences.getString(userID).toString(),
+        firstMonthDate.toString(),
+        lastMonthDate.toString(),
+        widget.deviceId));
+    var jsonData = null;
+    if (res != null && res.statusCode != null && res.statusCode == 200) {
+      jsonData = convert.jsonDecode(res.body);
+      ChartData chartData = ChartData.fromJson(jsonData);
+      if (chartData.status.toString() == 'true') {
+        data = chartData.response;
+
+        plantAddress =
+            chartData.response[chartData.response.length - 1].address;
+
+        totalCapacityTxt =
+            '${chartData.response[chartData.response.length - 1].totalRCapacity}';
+
+        currentPowerTxt =
+            '${chartData.response[chartData.response.length - 1].currentRPower} kWh';
+
+        totalEnergyTxt =
+            '${chartData.response[chartData.response.length - 1].totalREnergy} kWh';
+
+        totalIncomeTxt =
+            '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy}').toString()} INR';
+
+        dailyRevenueTxt =
+            '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 }

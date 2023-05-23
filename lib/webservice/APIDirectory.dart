@@ -38,5 +38,18 @@ getPlantList(String userId) {
   return Uri.parse('${getBaseURL()}plant/list?userId=$userId');
 }
 getFaultList(String userId) {
-  return Uri.parse('${getBaseURL()}fault/list?userId=$userId');
+  return Uri.parse('${getBaseURL()}fault/checkFaultToday?userId=$userId');
 }
+
+
+getDeviceList(String userId,String status,String plantId) {
+  return Uri.parse('${getBaseURL()}TDevice/list?userId=$userId&status=$status&plant=$plantId');
+}
+
+getDailyDeviceChart(String userId,String date, String deviceId) {
+  return Uri.parse('${getBaseURL()}statistics/deviceReport?userId=${userId}&startD=${date}&deviceno=${deviceId}');
+}
+getMonthlyDeviceChart(String userId,String firstDate,String lastDate, String deviceId) {
+  return Uri.parse('${getBaseURL()}statistics/dMonthReport?userId=${userId}&strDate=${firstDate}&endDate=${lastDate}&deviceno=${deviceId}');
+}
+
