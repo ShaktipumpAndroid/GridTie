@@ -34,12 +34,13 @@ class _MonthWidgetState extends State<MonthWidget> {
       plantAddress = "",
       currentPowerTxt = "",
       totalEnergyTxt = "",
+      todayEnergyTxt = "",
       totalCapacityTxt = "",
       totalIncomeTxt = "",
-      dailyRevenueTxt = "",
+      todayIncomeTxt = "",
       firstMonthDate = "",
       lastMonthDate = "",
-      dateFormat = "yyyy-MM-dd",
+      dateFormat = "MM/dd/yyyy",
       dateFormat2 = "MM-yyyy";
 
   @override
@@ -116,9 +117,9 @@ class _MonthWidgetState extends State<MonthWidget> {
             onPressed: () {
               DateTime date = SelectedDate.subtract(Duration(days: 30));
               if (date.year > 2017) {
-                var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+                var inputFormat = DateFormat('MM/dd/yyyy HH:mm');
                 SelectedDate = inputFormat.parse(
-                    "${DateFormat('yyyy-MM-dd').format(date)} ${DateFormat('HH:mm').format(date)}");
+                    "${DateFormat('MM/dd/yyyy').format(date)} ${DateFormat('HH:mm').format(date)}");
                 var outputFormat = DateFormat(dateFormat);
                 setState(() {
                   selectedDateText =
@@ -174,13 +175,13 @@ class _MonthWidgetState extends State<MonthWidget> {
           IconButton(
             onPressed: () {
               DateTime date = SelectedDate.add(Duration(days: 30));
-              var inputFormat = DateFormat('yyyy-MM-dd');
+              var inputFormat = DateFormat('MM/dd/yyyy');
               SelectedDate =
-                  inputFormat.parse("${DateFormat('yyyy-MM-dd').format(date)}");
+                  inputFormat.parse("${DateFormat('MM/dd/yyyy').format(date)}");
               var outputFormat = DateFormat(dateFormat);
               changeDate = outputFormat.format(SelectedDate);
               setState(() {
-                if (Utility().dateConverter(changeDate.toString(), 30) ==
+                if (Utility().monthYearConverter(changeDate.toString(), 30) ==
                     "Tomorrow") {
                   Utility().showInSnackBar(
                       value: 'Cant select future months', context: context);
@@ -223,9 +224,9 @@ class _MonthWidgetState extends State<MonthWidget> {
       onSubmit: (index) {
         print(index);
         SelectedDate = index;
-        var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+        var inputFormat = DateFormat('MM/dd/yyyy HH:mm');
         SelectedDate = inputFormat.parse(
-            "${DateFormat('yyyy-MM-dd').format(index)} ${DateFormat('HH:mm').format(SelectedDate)}");
+            "${DateFormat('MM/dd/yyyy').format(index)} ${DateFormat('HH:mm').format(SelectedDate)}");
         var outputFormat = DateFormat(dateFormat2);
         setState(() {
           selectedDateText = outputFormat.format(SelectedDate);
@@ -271,7 +272,12 @@ class _MonthWidgetState extends State<MonthWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 robotoTextWidget(
-                    textval: plantAddress.trim(),
+                    textval: '$currentPower:- $currentPowerTxt',
+                    colorval: AppColor.whiteColor,
+                    sizeval: 12,
+                    fontWeight: FontWeight.w600),
+                robotoTextWidget(
+                    textval: '$address:- $plantAddress',
                     colorval: AppColor.whiteColor,
                     sizeval: 12,
                     fontWeight: FontWeight.w600)
@@ -303,7 +309,7 @@ class _MonthWidgetState extends State<MonthWidget> {
                       detailBoxWidget(totalIncome, totalIncomeTxt.toString()),
                     ],
                   ),
-                  Container(
+                 /* Container(
                     margin: const EdgeInsets.all(20),
                     height: 1,
                     color: AppColor.grey,
@@ -311,11 +317,11 @@ class _MonthWidgetState extends State<MonthWidget> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      detailBoxWidget(currentPower, currentPowerTxt.toString()),
+                      detailBoxWidget(todayEnergy, todayEnergyTxt.toString()),
                       lineWidget(),
-                      detailBoxWidget(dailyRevenue, dailyRevenueTxt.toString()),
+                      detailBoxWidget(todayIncome, todayIncomeTxt.toString()),
                     ],
-                  )
+                  )*/
                 ],
               )
             ],
@@ -395,7 +401,9 @@ class _MonthWidgetState extends State<MonthWidget> {
         totalIncomeTxt =
             '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy}').toString()} INR';
 
-        dailyRevenueTxt =
+        todayEnergyTxt = '${chartData.response[chartData.response.length - 1].todayREnergy} kWh';
+
+        todayIncomeTxt =
             '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
       }
 

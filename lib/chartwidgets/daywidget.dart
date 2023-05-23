@@ -32,9 +32,10 @@ class _DayWidgetState extends State<DayWidget> {
       plantAddress = "",
       currentPowerTxt = "",
       totalEnergyTxt = "",
+      todayEnergyTxt = "",
       totalCapacityTxt = "",
       totalIncomeTxt = "",
-      dailyRevenueTxt = "";
+      todayIncomeTxt = "";
   late DateTime SelectedDate, mindatime;
   String dateFormat = "yyyy-MM-dd", dateFormat2 = "yyyy-MM-dd";
   bool isLoading = true;
@@ -251,7 +252,12 @@ class _DayWidgetState extends State<DayWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 robotoTextWidget(
-                    textval: 'Address:- $plantAddress',
+                    textval: '$currentPower:- $currentPowerTxt',
+                    colorval: AppColor.whiteColor,
+                    sizeval: 12,
+                    fontWeight: FontWeight.w600),
+                robotoTextWidget(
+                    textval: '$address:- $plantAddress',
                     colorval: AppColor.whiteColor,
                     sizeval: 12,
                     fontWeight: FontWeight.w600)
@@ -291,9 +297,9 @@ class _DayWidgetState extends State<DayWidget> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      detailBoxWidget(currentPower, currentPowerTxt.toString()),
+                      detailBoxWidget(todayEnergy, todayEnergyTxt.toString()),
                       lineWidget(),
-                      detailBoxWidget(dailyRevenue, dailyRevenueTxt.toString()),
+                      detailBoxWidget(todayIncome, todayIncomeTxt.toString()),
                     ],
                   )
                 ],
@@ -360,15 +366,15 @@ class _DayWidgetState extends State<DayWidget> {
         data = chartData.response;
         plantAddress = chartData.response[chartData.response.length - 1].address;
 
-        currentPowerTxt =
-            '${chartData.response[chartData.response.length - 1].currentRPower} kWh';
+        currentPowerTxt = '${chartData.response[chartData.response.length - 1].currentRPower} kWh';
 
-        totalEnergyTxt =
-            '${chartData.response[chartData.response.length - 1].totalREnergy} kWh';
-        totalIncomeTxt =
-            '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy}').toString()} INR';
+        totalEnergyTxt = '${chartData.response[chartData.response.length - 1].totalREnergy} kWh';
 
-        dailyRevenueTxt =
+        totalIncomeTxt = '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy}').toString()} INR';
+
+        todayEnergyTxt = '${chartData.response[chartData.response.length - 1].todayREnergy} kWh';
+
+        todayIncomeTxt =
             '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
       }
 

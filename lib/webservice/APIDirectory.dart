@@ -53,3 +53,7 @@ getMonthlyDeviceChart(String userId,String firstDate,String lastDate, String dev
   return Uri.parse('${getBaseURL()}statistics/dMonthReport?userId=${userId}&strDate=${firstDate}&endDate=${lastDate}&deviceno=${deviceId}');
 }
 
+getYearlyDeviceChart(String userId,String firstDate,String lastDate, String deviceId) {
+  return Uri.parse('${getBaseURL()}statistics/dYearReport?userId=${userId}&strDate=${firstDate}&endDate=${lastDate}&deviceno=${deviceId}');
+}
+

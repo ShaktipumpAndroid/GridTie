@@ -42,3 +42,6 @@ var closeIssue = 'Close issue';
 var deviceList = 'Device Lists';
 var onlineDevices = 'Online Devices';
 var offlineDevices = 'Offline Devices';
+var todayEnergy = 'Today Energy';
+var todayIncome = 'Today Income';
+var address = 'Address';

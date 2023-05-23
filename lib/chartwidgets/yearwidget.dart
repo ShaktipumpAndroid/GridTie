@@ -33,12 +33,13 @@ class _YearWidgetState extends State<YearWidget> {
       plantAddress = "",
       currentPowerTxt = "",
       totalEnergyTxt = "",
+      todayEnergyTxt ="",
       totalCapacityTxt = "",
       totalIncomeTxt = "",
-      dailyRevenueTxt = "",
+      todayIncomeTxt = "",
       yearFirstDate = "",
       yearLastDate = "",
-      dateFormat = "yyyy-MM-dd",
+      dateFormat = "MM/dd/yyyy",
       dateFormat2 = "yyyy";
 
   @override
@@ -53,9 +54,10 @@ class _YearWidgetState extends State<YearWidget> {
     setState(() {
       selectedDateText = DateFormat(dateFormat2).format(SelectedDate);
       changeDate = outputFormat.format(SelectedDate);
-      yearFirstDate = '$selectedDateText${'-01-01'}';
-      yearLastDate = '$selectedDateText${'-12-31'}';
+      yearFirstDate = '01/01/$selectedDateText';
+      yearLastDate = '12/31/$selectedDateText';
     });
+    yearDataAPI();
   }
 
   @override
@@ -114,16 +116,17 @@ class _YearWidgetState extends State<YearWidget> {
               DateTime date = SelectedDate.subtract(Duration(days: 365));
 
               if (date.year > 2017) {
-                var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+                var inputFormat = DateFormat('MM/dd/yyyy HH:mm');
                 SelectedDate = inputFormat.parse(
-                    "${DateFormat('yyyy-MM-dd').format(date)} ${DateFormat('HH:mm').format(date)}");
+                    "${DateFormat('MM/dd/yyyy').format(date)} ${DateFormat('HH:mm').format(date)}");
                 var outputFormat = DateFormat(dateFormat);
                 setState(() {
                   selectedDateText =
                       DateFormat(dateFormat2).format(SelectedDate);
                   changeDate = outputFormat.format(SelectedDate);
-                  yearFirstDate = '$selectedDateText${'-01-01'}';
-                  yearLastDate = '$selectedDateText${'-12-31'}';
+                  yearFirstDate = '01/01/$selectedDateText';
+                  yearLastDate = '12/31/$selectedDateText';
+                  yearDataAPI();
                 });
               } else {
                 Utility().showInSnackBar(
@@ -168,14 +171,14 @@ class _YearWidgetState extends State<YearWidget> {
           IconButton(
             onPressed: () {
               DateTime date = SelectedDate.add(Duration(days: 365));
-              print('date${date.year}');
-              var inputFormat = DateFormat('yyyy-MM-dd');
+
+              var inputFormat = DateFormat('MM/dd/yyyy');
               SelectedDate =
-                  inputFormat.parse("${DateFormat('yyyy-MM-dd').format(date)}");
+                  inputFormat.parse("${DateFormat('MM/dd/yyyy').format(date)}");
               var outputFormat = DateFormat(dateFormat);
               changeDate = outputFormat.format(SelectedDate);
               setState(() {
-                if (Utility().dateConverter(changeDate.toString(), 365) ==
+                if (Utility().monthYearConverter(changeDate.toString(), 365) ==
                     "Tomorrow") {
                   Utility().showInSnackBar(
                       value: 'Cant select future years', context: context);
@@ -184,8 +187,9 @@ class _YearWidgetState extends State<YearWidget> {
                 } else {
                   selectedDateText =
                       DateFormat(dateFormat2).format(SelectedDate);
-                  yearFirstDate = '$selectedDateText${'-01-01'}';
-                  yearLastDate = '$selectedDateText${'-12-31'}';
+                  yearFirstDate = '01/01/$selectedDateText';
+                  yearLastDate = '12/31/$selectedDateText';
+                  yearDataAPI();
                 }
               });
             },
@@ -218,7 +222,12 @@ class _YearWidgetState extends State<YearWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 robotoTextWidget(
-                    textval: plantAddress.trim(),
+                    textval: '$currentPower:- $currentPowerTxt',
+                    colorval: AppColor.whiteColor,
+                    sizeval: 12,
+                    fontWeight: FontWeight.w600),
+                robotoTextWidget(
+                    textval: '$address:- $plantAddress',
                     colorval: AppColor.whiteColor,
                     sizeval: 12,
                     fontWeight: FontWeight.w600)
@@ -250,7 +259,7 @@ class _YearWidgetState extends State<YearWidget> {
                       detailBoxWidget(totalIncome, totalIncomeTxt.toString()),
                     ],
                   ),
-                  Container(
+                 /* Container(
                     margin: const EdgeInsets.all(20),
                     height: 1,
                     color: AppColor.grey,
@@ -258,11 +267,11 @@ class _YearWidgetState extends State<YearWidget> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      detailBoxWidget(currentPower, currentPowerTxt.toString()),
+                      detailBoxWidget(todayEnergy, todayEnergyTxt.toString()),
                       lineWidget(),
-                      detailBoxWidget(dailyRevenue, dailyRevenueTxt.toString()),
+                      detailBoxWidget(todayIncome, todayIncomeTxt.toString()),
                     ],
-                  )
+                  )*/
                 ],
               )
             ],
@@ -315,7 +324,7 @@ class _YearWidgetState extends State<YearWidget> {
         await SharedPreferences.getInstance();
     var outputFormat = DateFormat(dateFormat2);
 
-    dynamic res = await HTTP.get(getMonthlyDeviceChart(
+    dynamic res = await HTTP.get(getYearlyDeviceChart(
         sharedPreferences.getString(userID).toString(),
         yearFirstDate.toString(),
         yearLastDate.toString(),
@@ -342,7 +351,9 @@ class _YearWidgetState extends State<YearWidget> {
         totalIncomeTxt =
         '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy}').toString()} INR';
 
-        dailyRevenueTxt =
+        todayEnergyTxt =
+        '${chartData.response[chartData.response.length - 1].todayREnergy} kWh';
+        todayIncomeTxt =
         '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
       }
 

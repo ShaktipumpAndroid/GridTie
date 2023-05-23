@@ -61,17 +61,17 @@ class Utility {
     return date;
   }
 
-  String monthConverter(String myDate, int days) {
+  String monthYearConverter(String myDate, int days) {
     String date;
     DateTime convertedDate =
-    DateFormat("MM-yyyy").parse(myDate.toString());
+    DateFormat("MM/dd/yyyy").parse(myDate.toString());
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = DateTime(now.year, now.month, now.day - days);
     final tomorrow = DateTime(now.year, now.month, now.day + days);
 
     final dateToCheck = convertedDate;
-    final checkDate = DateTime(dateToCheck.year, dateToCheck.month);
+    final checkDate = DateTime(dateToCheck.year, dateToCheck.month, dateToCheck.day);
     if (checkDate == today) {
       date = "Today";
     } else if (checkDate == yesterday) {
