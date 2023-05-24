@@ -333,7 +333,7 @@ class _YearWidgetState extends State<YearWidget> {
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
       ChartData chartData = ChartData.fromJson(jsonData);
-      if (chartData.status.toString() == 'true') {
+      if (chartData.status.toString() == 'true'&& chartData.response.isNotEmpty) {
         data = chartData.response;
 
         plantAddress =

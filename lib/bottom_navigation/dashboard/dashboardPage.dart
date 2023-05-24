@@ -7,13 +7,11 @@ import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../Util/utility.dart';
 import '../../theme/string.dart';
 import '../../webservice/APIDirectory.dart';
 import '../../webservice/constant.dart';
-import '../../chartwidgets/model/chartdata.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -28,8 +26,10 @@ class _DashboardPageState extends State<DashboardPage> {
   String? currentPowerTxt = "0",
       totalEnergyTxt = "0",
       totalIncomeTxt = "0",
-      activePlantTxt = "0",
-      dailyRevenueTxt = "0",
+      allPlantTxt = "0",
+      onlinePlantsTxt = "0",
+      offlinePlantsTxt = "0",
+      todayEnergyTxt = "0",
       totalCapacityTxt = "0";
 
   @override
@@ -38,7 +38,6 @@ class _DashboardPageState extends State<DashboardPage> {
     super.initState();
     _scaffoldKey = GlobalKey();
     dashBoardAPI();
-
   }
 
   @override
@@ -47,7 +46,6 @@ class _DashboardPageState extends State<DashboardPage> {
       super.setState(fn);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -103,9 +101,10 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Container pieChartWidget() {
     return Container(
-      margin: const EdgeInsets.only(top: 70),
-      height: MediaQuery.of(context).size.height / 8,
-      child: Container() /*SfCircularChart(series: <CircularSeries>[
+        margin: const EdgeInsets.only(top: 70),
+        height: MediaQuery.of(context).size.height / 8,
+        child:
+            Container() /*SfCircularChart(series: <CircularSeries>[
         // Render pie chart
         PieSeries<ChartData, String>(
           dataSource: chartData,
@@ -117,7 +116,7 @@ class _DashboardPageState extends State<DashboardPage> {
           // dataLabelSettings: const DataLabelSettings(isVisible: true)
         )
       ]),*/
-    );
+        );
   }
 
   Align dailyRevenueWidget() {
@@ -137,7 +136,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       blurRadius: 20,
                       offset: Offset(0, 10))
                 ]),
-            child:  Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
@@ -147,7 +146,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: robotoTextWidget(
-                            textval: dailyRevenue,
+                            textval: todayEnergy,
                             colorval: Colors.blue,
                             sizeval: 14,
                             fontWeight: FontWeight.bold),
@@ -155,11 +154,11 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     Container(
                       margin:
-                      const EdgeInsets.only(top: 5, left: 20, bottom: 10),
+                          const EdgeInsets.only(top: 5, left: 20, bottom: 10),
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: robotoTextWidget(
-                            textval: dailyRevenueTxt.toString(),
+                            textval: todayEnergyTxt.toString(),
                             colorval: Colors.black,
                             sizeval: 25,
                             fontWeight: FontWeight.normal),
@@ -192,7 +191,7 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height / 3,
-        margin: EdgeInsets.only(left: 10,right: 10),
+        margin: EdgeInsets.only(left: 10, right: 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -214,7 +213,7 @@ class _DashboardPageState extends State<DashboardPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                detailBoxWidget(activePlants, activePlantTxt.toString()),
+                detailBoxWidget(allPlants, allPlantTxt.toString()),
                 lineWidget(),
                 detailBoxWidget(totalCapacity, totalCapacityTxt.toString()),
               ],
@@ -225,11 +224,10 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-
   SizedBox detailBoxWidget(String title, String value) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.45,
-      child:  Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -246,11 +244,57 @@ class _DashboardPageState extends State<DashboardPage> {
               colorval: Colors.black,
               sizeval: 16,
               fontWeight: FontWeight.normal),
+          title == allPlants
+              ? Container(
+                  margin: EdgeInsets.only(left: 10, right: 10, top: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          loadSVG('assets/svg/activedot.svg'),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          robotoTextWidget(
+                              textval: '${onlinePlants}:- $onlinePlantsTxt',
+                              colorval: Colors.black,
+                              sizeval: 12,
+                              fontWeight: FontWeight.normal),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          loadSVG('assets/svg/deactivedot.svg'),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          robotoTextWidget(
+                              textval: '${offlinePlants}:- $offlinePlantsTxt',
+                              colorval: Colors.black,
+                              sizeval: 12,
+                              fontWeight: FontWeight.normal),
+                        ],
+                      )
+                    ],
+                  ),
+                )
+              : const SizedBox()
         ],
       ),
     );
   }
 
+  Widget loadSVG(String svg) {
+    return SvgPicture.asset(
+      svg,
+      width: 13,
+      height: 13,
+    );
+  }
 
   Container lineWidget() {
     return Container(
@@ -277,20 +321,22 @@ class _DashboardPageState extends State<DashboardPage> {
       if (dashboardModel.status.toString() == 'true') {
         currentPowerTxt =
             '${dashboardModel.response.currentPower.toStringAsFixed(2)} kWh';
+
+        todayEnergyTxt =
+            '${dashboardModel.response.todayEnergy.toStringAsFixed(2)} kWh';
+
         totalEnergyTxt =
             '${dashboardModel.response.totalEnergy.toStringAsFixed(2)} kWh';
 
-        activePlantTxt = dashboardModel.response.onlinePlant.toString();
+        allPlantTxt = dashboardModel.response.totalPlant.toString();
+        onlinePlantsTxt = dashboardModel.response.onlinePlant.toString();
+        offlinePlantsTxt = dashboardModel.response.offlinePlant.toString();
 
         totalCapacityTxt =
-        '${dashboardModel.response.totalCapacity.toStringAsFixed(2)} kWh';
+            '${dashboardModel.response.totalCapacity.toStringAsFixed(2)} kWh';
 
         totalIncomeTxt =
             '${Utility().calculateRevenue(dashboardModel.response.totalEnergy.toString()).toString()} INR';
-
-
-        dailyRevenueTxt =
-            '${Utility().calculateRevenue(dashboardModel.response.todayEnergy.toString()).toString()} INR';
       }
 
       setState(() {
@@ -304,6 +350,4 @@ class _DashboardPageState extends State<DashboardPage> {
       }
     }
   }
-
-
 }
