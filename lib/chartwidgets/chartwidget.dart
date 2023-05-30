@@ -10,8 +10,9 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'model/chartdata.dart';
 
 class ChartWidget extends StatefulWidget {
-   ChartWidget({Key? key,required this.deviceId}) : super(key: key);
+   ChartWidget({Key? key,required this.deviceId,required this.isPlant}) : super(key: key);
   String deviceId;
+  bool isPlant;
 
   @override
   State<ChartWidget> createState() => _ChartWidgetState();
@@ -54,9 +55,9 @@ class _ChartWidgetState extends State<ChartWidget> {
           body:   TabBarView(
             physics: NeverScrollableScrollPhysics(),
             children: [
-             DayWidget(deviceId: widget.deviceId,),
-              MonthWidget(deviceId: widget.deviceId ,),
-              YearWidget(deviceId: widget.deviceId,),
+             DayWidget(deviceId: widget.deviceId,isPlant: widget.isPlant,),
+              MonthWidget(deviceId: widget.deviceId,isPlant: widget.isPlant,),
+              YearWidget(deviceId: widget.deviceId,isPlant: widget.isPlant,),
             ],
           ),
         ),

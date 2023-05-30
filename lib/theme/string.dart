@@ -47,3 +47,5 @@ var todayIncome = 'Today Income';
 var address = 'Address';
 var onlinePlants = 'Online Plants';
 var offlinePlants = 'Offline Plants';
+var reports = 'Reports';
+var devices = 'Devices';

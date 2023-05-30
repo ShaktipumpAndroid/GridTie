@@ -2,29 +2,33 @@ import 'dart:convert' as convert;
 
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:grid_tie/chartwidgets/model/chartdata.dart' as DevicePrefix;
+import 'package:grid_tie/chartwidgets/model/plantchartdata.dart' as PlantPrefix;
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
 import '../Util/utility.dart';
 import '../theme/color.dart';
 import '../theme/string.dart';
 import '../webservice/APIDirectory.dart';
 import '../webservice/constant.dart';
-import 'model/chartdata.dart';
+
+
 
 class DayWidget extends StatefulWidget {
-  DayWidget({Key? key, required this.deviceId}) : super(key: key);
+  DayWidget({Key? key, required this.deviceId,required this.isPlant}) : super(key: key);
   String deviceId;
+  bool isPlant;
 
   @override
   State<DayWidget> createState() => _DayWidgetState();
 }
 
 class _DayWidgetState extends State<DayWidget> {
-  late List<Response> data = [];
+  late List<DevicePrefix.Response> deviceData = [];
+  late List<PlantPrefix.Response> plantData = [];
   late TooltipBehavior _tooltip;
   String selectedDateText = "",
       changeDate = "",
@@ -87,14 +91,22 @@ class _DayWidgetState extends State<DayWidget> {
       margin: const EdgeInsets.only(left: 20, right: 20),
       child: SfCartesianChart(
           primaryXAxis: CategoryAxis(),
-          primaryYAxis: NumericAxis(minimum: 0, maximum: 50, interval: 10),
+          primaryYAxis:  widget.isPlant?NumericAxis(minimum: 0, maximum: 300, interval: 50):NumericAxis(minimum: 0, maximum: 50, interval: 10),
           tooltipBehavior: _tooltip,
-          series: <ChartSeries<Response, String>>[
-            AreaSeries<Response, String>(
-                dataSource: data,
-                xValueMapper: (Response data, _) =>
+          series: widget.isPlant?<ChartSeries<PlantPrefix.Response, String>>[
+            AreaSeries<PlantPrefix.Response, String>(
+                dataSource: plantData,
+                xValueMapper: (PlantPrefix.Response data, _) =>
+                    Utility().changeTimeFormate1(data.dDate),
+                yValueMapper: (PlantPrefix.Response data, _) => data.totalDEnergy,
+                name: 'Peak Energy',
+                color: AppColor.themeColor)
+          ]:<ChartSeries<DevicePrefix.Response, String>>[
+            AreaSeries<DevicePrefix.Response, String>(
+                dataSource: deviceData,
+                xValueMapper: (DevicePrefix.Response data, _) =>
                     Utility().changeTimeFormate1(data.date1),
-                yValueMapper: (Response data, _) => data.todayREnergy,
+                yValueMapper: (DevicePrefix.Response data, _) => data.todayREnergy,
                 name: 'Peak Energy',
                 color: AppColor.themeColor)
           ]),
@@ -251,11 +263,11 @@ class _DayWidgetState extends State<DayWidget> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                robotoTextWidget(
+                !widget.isPlant?robotoTextWidget(
                     textval: '$currentPower:- $currentPowerTxt',
                     colorval: AppColor.whiteColor,
                     sizeval: 12,
-                    fontWeight: FontWeight.w600),
+                    fontWeight: FontWeight.w600):SizedBox(),
                 robotoTextWidget(
                     textval: '$address:- $plantAddress',
                     colorval: AppColor.whiteColor,
@@ -344,16 +356,24 @@ class _DayWidgetState extends State<DayWidget> {
     );
   }
 
-  Future<void> dailyDataAPI() async {
+  Future<void> dailyDataAPI()  async {
     if (mounted) {
       setState(() {
         isLoading = true;
       });
     }
+    if(widget.isPlant){
+      plantDataAPI();
+    }else{
+
+      DeviceDataAPI();
+    }
+  }
+
+  void DeviceDataAPI() async{
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
     var outputFormat = DateFormat(dateFormat2);
-
     dynamic res = await HTTP.get(getDailyDeviceChart(
         sharedPreferences.getString(userID).toString(),
         outputFormat.format(SelectedDate).toString(),
@@ -361,9 +381,9 @@ class _DayWidgetState extends State<DayWidget> {
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
-      ChartData chartData = ChartData.fromJson(jsonData);
+      DevicePrefix.ChartData chartData =  DevicePrefix.ChartData.fromJson(jsonData);
       if (chartData.status.toString() == 'true' && chartData.response.isNotEmpty) {
-        data = chartData.response;
+        deviceData = chartData.response;
         plantAddress = chartData.response[chartData.response.length - 1].address;
 
         currentPowerTxt = '${chartData.response[chartData.response.length - 1].currentRPower} kWh';
@@ -375,7 +395,7 @@ class _DayWidgetState extends State<DayWidget> {
         todayEnergyTxt = '${chartData.response[chartData.response.length - 1].todayREnergy} kWh';
 
         todayIncomeTxt =
-            '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
       }
 
       setState(() {
@@ -389,4 +409,45 @@ class _DayWidgetState extends State<DayWidget> {
       }
     }
   }
+
+  void plantDataAPI() async{
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    var outputFormat = DateFormat(dateFormat2);
+    dynamic res = await HTTP.get(getDailyPlantChart(
+        sharedPreferences.getString(userID).toString(),
+        outputFormat.format(SelectedDate).toString(),
+        widget.deviceId));
+    var jsonData = null;
+    if (res != null && res.statusCode != null && res.statusCode == 200) {
+      jsonData = convert.jsonDecode(res.body);
+      PlantPrefix.PlantChartData plantChartData =  PlantPrefix.PlantChartData.fromJson(jsonData);
+      if (plantChartData.status.toString() == 'true' && plantChartData.response.isNotEmpty) {
+        plantData = plantChartData.response;
+        plantAddress = plantChartData.response[plantChartData.response.length - 1].address;
+
+     //   currentPowerTxt = '${plantChartData.response[plantChartData.response.length - 1].currentRPower} kWh';
+
+        totalEnergyTxt = '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy} kWh';
+
+        totalIncomeTxt = '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy}').toString()} INR';
+
+        todayEnergyTxt = '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy} kWh';
+
+        todayIncomeTxt =
+        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy}').toString()} INR';
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
 }

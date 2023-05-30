@@ -29,7 +29,7 @@ class _DeviceDetailPageState extends State<DeviceDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children:  [
-            ChartWidget(deviceId: widget.deviceId,),
+            ChartWidget(deviceId: widget.deviceId,isPlant: false,),
           ]),
     );
   }

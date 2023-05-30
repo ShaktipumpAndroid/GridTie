@@ -12,18 +12,21 @@ import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/APIDirectory.dart';
 import '../webservice/constant.dart';
-import 'model/chartdata.dart';
+import 'package:grid_tie/chartwidgets/model/chartdata.dart' as DevicePrefix;
+import 'package:grid_tie/chartwidgets/model/plantchartdata.dart' as PlantPrefix;
 
 class YearWidget extends StatefulWidget {
-  YearWidget({Key? key, required this.deviceId}) : super(key: key);
+  YearWidget({Key? key, required this.deviceId,required this.isPlant}) : super(key: key);
   String deviceId;
+  bool isPlant;
 
   @override
   State<YearWidget> createState() => _YearWidgetState();
 }
 
 class _YearWidgetState extends State<YearWidget> {
-  late List<Response> data = [];
+  late List<DevicePrefix.Response> deviceData = [];
+  late List<PlantPrefix.Response> plantData = [];
   late TooltipBehavior _tooltip;
   late DateTime SelectedDate, mindatime;
   bool isLoading = false;
@@ -94,12 +97,20 @@ class _YearWidgetState extends State<YearWidget> {
             primaryXAxis: CategoryAxis(),
             primaryYAxis: NumericAxis(minimum: 0, maximum: 50, interval: 10),
             tooltipBehavior: _tooltip,
-            series: <ChartSeries<Response, String>>[
-              ColumnSeries<Response, String>(
-                  dataSource: data,
-                  xValueMapper: (Response data, _) =>
+            series: widget.isPlant?<ChartSeries<PlantPrefix.Response, String>>[
+              ColumnSeries<PlantPrefix.Response, String>(
+                  dataSource: plantData,
+                  xValueMapper: (PlantPrefix.Response data, _) =>
+                      Utility().changeMonthFormate(data.dDate),
+                  yValueMapper: (PlantPrefix.Response data, _) => data.totalMEnergy,
+                  name: 'Peak Energy',
+                  color: AppColor.themeColor)
+            ]:<ChartSeries<DevicePrefix.Response, String>>[
+              ColumnSeries<DevicePrefix.Response, String>(
+                  dataSource: deviceData,
+                  xValueMapper: (DevicePrefix.Response data, _) =>
                       Utility().changeMonthFormate(data.date1),
-                  yValueMapper: (Response data, _) => data.todayREnergy,
+                  yValueMapper: (DevicePrefix.Response data, _) => data.todayREnergy,
                   name: 'Peak Energy',
                   color: AppColor.themeColor)
             ]));
@@ -320,9 +331,16 @@ class _YearWidgetState extends State<YearWidget> {
         isLoading = true;
       });
     }
+    if(widget.isPlant){
+      plantDataAPI();
+    }else{
+      DeviceDataAPI();
+    }
+  }
+
+  void DeviceDataAPI() async{
     final SharedPreferences sharedPreferences =
-        await SharedPreferences.getInstance();
-    var outputFormat = DateFormat(dateFormat2);
+    await SharedPreferences.getInstance();
 
     dynamic res = await HTTP.get(getYearlyDeviceChart(
         sharedPreferences.getString(userID).toString(),
@@ -332,18 +350,18 @@ class _YearWidgetState extends State<YearWidget> {
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
-      ChartData chartData = ChartData.fromJson(jsonData);
+      DevicePrefix.ChartData chartData = DevicePrefix.ChartData.fromJson(jsonData);
       if (chartData.status.toString() == 'true'&& chartData.response.isNotEmpty) {
-        data = chartData.response;
+        deviceData = chartData.response;
 
         plantAddress =
             chartData.response[chartData.response.length - 1].address;
 
         totalCapacityTxt =
-            '${chartData.response[chartData.response.length - 1].totalRCapacity}';
+        '${chartData.response[chartData.response.length - 1].totalRCapacity}';
 
         currentPowerTxt =
-            '${chartData.response[chartData.response.length - 1].currentRPower} kWh';
+        '${chartData.response[chartData.response.length - 1].currentRPower} kWh';
 
         totalEnergyTxt =
         '${chartData.response[chartData.response.length - 1].totalREnergy} kWh';
@@ -367,5 +385,55 @@ class _YearWidgetState extends State<YearWidget> {
         });
       }
     }
+  }
+
+  void plantDataAPI() async{
+    final SharedPreferences sharedPreferences =
+    await SharedPreferences.getInstance();
+
+    dynamic res = await HTTP.get(getYearlyPlantChart(
+        sharedPreferences.getString(userID).toString(),
+        yearFirstDate.toString(),
+        yearLastDate.toString(),
+        widget.deviceId));
+    var jsonData = null;
+    if (res != null && res.statusCode != null && res.statusCode == 200) {
+      jsonData = convert.jsonDecode(res.body);
+      PlantPrefix.PlantChartData plantChartData = PlantPrefix.PlantChartData.fromJson(jsonData);
+      if (plantChartData.status.toString() == 'true'&& plantChartData.response.isNotEmpty) {
+        plantData = plantChartData.response;
+
+        plantAddress =
+            plantChartData.response[plantChartData.response.length - 1].address;
+
+        totalCapacityTxt =
+        '${plantChartData.response[plantChartData.response.length - 1].totalPCapacity}';
+
+     /*   currentPowerTxt =
+        '${plantChartData.response[plantChartData.response.length - 1].currentRPower} kWh';*/
+
+        totalEnergyTxt =
+        '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy} kWh';
+
+        totalIncomeTxt =
+        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy}').toString()} INR';
+
+        todayEnergyTxt =
+        '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy} kWh';
+        todayIncomeTxt =
+        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy}').toString()} INR';
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+
   }
 }

@@ -57,3 +57,15 @@ getYearlyDeviceChart(String userId,String firstDate,String lastDate, String devi
   return Uri.parse('${getBaseURL()}statistics/dYearReport?userId=${userId}&strDate=${firstDate}&endDate=${lastDate}&deviceno=${deviceId}');
 }
 
+getDailyPlantChart(String userId,String date, String deviceId) {
+  return Uri.parse('${getBaseURL()}statistics/report?userId=${userId}&startD=${date}&plantID=${deviceId}');
+}
+
+getMonthlyPlantChart(String userId,String firstDate,String lastDate, String deviceId) {
+  return Uri.parse('${getBaseURL()}statistics/pMonthReport?userId=${userId}&startD=${firstDate}&endDate=${lastDate}&plantID=${deviceId}');
+}
+
+getYearlyPlantChart(String userId,String firstDate,String lastDate, String deviceId) {
+  return Uri.parse('${getBaseURL()}statistics/pYearReport?userId=${userId}&strDate=${firstDate}&endDate=${lastDate}&plantID=${deviceId}');
+}
+//ShaktiGridTieInverter/statistics/pMonthReport?userId=2&startD=2023-05-29&plantID=122

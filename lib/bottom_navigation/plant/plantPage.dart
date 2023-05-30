@@ -6,6 +6,7 @@ import 'package:grid_tie/bottom_navigation/plant/device/DeviceListPage.dart';
 import 'package:grid_tie/bottom_navigation/plant/device/devicePage.dart';
 import 'package:grid_tie/bottom_navigation/plant/model/plantlistmodel.dart';
 import 'package:grid_tie/bottom_navigation/plant/device/devicedetailwidget.dart';
+import 'package:grid_tie/chartwidgets/chartwidget.dart';
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -75,7 +76,7 @@ class _PlantPageState extends State<PlantPage> {
       return NoDataFound();
     }
     return  Container(
-          margin: EdgeInsets.only(top: 40),
+          margin: const EdgeInsets.only(top: 40),
           child: ListView.builder(
             itemBuilder: (context, index) {
               return ListItem(index);
@@ -88,15 +89,7 @@ class _PlantPageState extends State<PlantPage> {
 
   Wrap ListItem(int index) {
     return Wrap(children: [
-
-      InkWell(
-        onTap: (){
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (BuildContext context) =>  DevicePage(plantId: plantList[index].pid.toString(),)),
-                  (Route<dynamic> route) => true);
-        },
-        child: Card(
+      Card(
             color: AppColor.whiteColor,
             elevation: 10,
             semanticContainer: true,
@@ -140,13 +133,93 @@ class _PlantPageState extends State<PlantPage> {
                         sizeval: 14.0,
                         fontWeight: FontWeight.w600,
                       )),
+
+                     Row(
+                          children: [
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>  ChartWidget(deviceId: plantList[index].pid.toString(),isPlant:true)),
+                                      (Route<dynamic> route) => true);
+
+                            },
+                            child: IconWidget('assets/svg/plantreports.svg',reports),
+                          ),
+                          const SizedBox(width: 5,),
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>  DevicePage(plantId: plantList[index].pid.toString())),
+                                      (Route<dynamic> route) => true);
+                            },
+                            child: IconWidget('assets/svg/solardevice.svg',devices),
+                          ),
+                        ],),
+
                     ],
                   ),
 
                 ]))
         ),
-      )]);
+    ]);
   }
+
+  Widget loadSVG(String svg) {
+    return SvgPicture.asset(
+      svg,
+      width: 13,
+      height: 13,
+    );
+  }
+
+  SizedBox NoDataFound() {
+    return SizedBox(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Center(
+            child: Container(
+              height: MediaQuery.of(context).size.height / 10,
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.only(left: 20, right: 20),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Color.fromRGBO(30, 136, 229, .5),
+                        blurRadius: 20,
+                        offset: Offset(0, 10))
+                  ]),
+              child: Align(
+                alignment: Alignment.center,
+                child: robotoTextWidget(
+                    textval: noDataFound,
+                    colorval: AppColor.themeColor,
+                    sizeval: 14,
+                    fontWeight: FontWeight.bold),
+              ),
+            )));
+  }
+
+  SizedBox IconWidget(String svg, String txt) {
+    return SizedBox(
+      width: 50,
+      child: Column(
+        children: [
+          SvgPicture.asset(
+            svg,
+            width: 30,
+            height: 30,
+          ),
+          const SizedBox(height: 5,),
+          robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 10, fontWeight: FontWeight.w400)
+        ],
+      ),
+    );
+  }
+
 
   Future<void> plantListAPI() async {
     if (mounted) {
@@ -178,40 +251,7 @@ class _PlantPageState extends State<PlantPage> {
     }
   }
 
-  Widget loadSVG(String svg) {
-    return SvgPicture.asset(
-      svg,
-      width: 13,
-      height: 13,
-    );
-  }
 
-  SizedBox NoDataFound() {
-    return SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Center(
-            child: Container(
-          height: MediaQuery.of(context).size.height / 10,
-          width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.only(left: 20, right: 20),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: const [
-                BoxShadow(
-                    color: Color.fromRGBO(30, 136, 229, .5),
-                    blurRadius: 20,
-                    offset: Offset(0, 10))
-              ]),
-          child: Align(
-            alignment: Alignment.center,
-            child: robotoTextWidget(
-                textval: noDataFound,
-                colorval: AppColor.themeColor,
-                sizeval: 14,
-                fontWeight: FontWeight.bold),
-          ),
-        )));
-  }
+
+
 }
