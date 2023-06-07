@@ -38,6 +38,7 @@ class Response {
   String address;
   String dDate;
   dynamic totalDEnergy;
+  dynamic current_Energy;
 
   Response({
     required this.totalPCapacity,
@@ -45,6 +46,7 @@ class Response {
     required this.address,
     required this.dDate,
     required this.totalDEnergy,
+    required this.current_Energy,
   });
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
@@ -53,6 +55,7 @@ class Response {
     address: json["total_PCapacity"]!=null?json["address"]:"",
     dDate: json["total_PCapacity"]!=null?json["d_date"]:"",
     totalDEnergy: json["total_PCapacity"]!=null?json["total_DEnergy"]?.toDouble():0.0,
+    current_Energy: json["current_Energy"]!=null?json["current_Energy"]?.toDouble():0.0,
   );
 
   Map<String, dynamic> toJson() => {
@@ -61,5 +64,6 @@ class Response {
     "address": address,
     "d_date": dDate,
     "total_DEnergy": totalDEnergy,
+    "current_Energy": current_Energy,
   };
 }

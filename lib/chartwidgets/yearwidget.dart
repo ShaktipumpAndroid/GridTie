@@ -27,6 +27,7 @@ class YearWidget extends StatefulWidget {
 class _YearWidgetState extends State<YearWidget> {
   late List<DevicePrefix.Response> deviceData = [];
   late List<PlantPrefix.Response> plantData = [];
+
   late TooltipBehavior _tooltip;
   late DateTime SelectedDate, mindatime;
   bool isLoading = false;
@@ -44,6 +45,8 @@ class _YearWidgetState extends State<YearWidget> {
       yearLastDate = "",
       dateFormat = "MM/dd/yyyy",
       dateFormat2 = "yyyy";
+
+  double maximumInterval = 50;
 
   @override
   void initState() {
@@ -95,7 +98,7 @@ class _YearWidgetState extends State<YearWidget> {
         margin: const EdgeInsets.only(left: 20, right: 20),
         child: SfCartesianChart(
             primaryXAxis: CategoryAxis(),
-            primaryYAxis: NumericAxis(minimum: 0, maximum: 50, interval: 10),
+            primaryYAxis:  widget.isPlant?NumericAxis(minimum: 0, maximum: maximumInterval, interval:maximumInterval/ 10):NumericAxis(minimum: 0, maximum: maximumInterval, interval: maximumInterval/10),
             tooltipBehavior: _tooltip,
             series: widget.isPlant?<ChartSeries<PlantPrefix.Response, String>>[
               ColumnSeries<PlantPrefix.Response, String>(
@@ -104,7 +107,7 @@ class _YearWidgetState extends State<YearWidget> {
                       Utility().changeMonthFormate(data.dDate),
                   yValueMapper: (PlantPrefix.Response data, _) => data.totalMEnergy,
                   name: 'Peak Energy',
-                  color: AppColor.themeColor)
+                  color: AppColor.chartColour)
             ]:<ChartSeries<DevicePrefix.Response, String>>[
               ColumnSeries<DevicePrefix.Response, String>(
                   dataSource: deviceData,
@@ -112,7 +115,7 @@ class _YearWidgetState extends State<YearWidget> {
                       Utility().changeMonthFormate(data.date1),
                   yValueMapper: (DevicePrefix.Response data, _) => data.todayREnergy,
                   name: 'Peak Energy',
-                  color: AppColor.themeColor)
+                  color: AppColor.chartColour)
             ]));
   }
 
@@ -232,11 +235,11 @@ class _YearWidgetState extends State<YearWidget> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                robotoTextWidget(
+                !widget.isPlant?robotoTextWidget(
                     textval: '$currentPower:- $currentPowerTxt',
                     colorval: AppColor.whiteColor,
                     sizeval: 12,
-                    fontWeight: FontWeight.w600),
+                    fontWeight: FontWeight.w600):SizedBox(),
                 robotoTextWidget(
                     textval: '$address:- $plantAddress',
                     colorval: AppColor.whiteColor,
@@ -373,6 +376,9 @@ class _YearWidgetState extends State<YearWidget> {
         '${chartData.response[chartData.response.length - 1].todayREnergy} kWh';
         todayIncomeTxt =
         '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
+
+        retriveDeviceMaxNumber(deviceData);
+
       }
 
       setState(() {
@@ -422,6 +428,8 @@ class _YearWidgetState extends State<YearWidget> {
         '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy} kWh';
         todayIncomeTxt =
         '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy}').toString()} INR';
+
+        retrivePlantMaxNumber(plantData);
       }
 
       setState(() {
@@ -436,4 +444,45 @@ class _YearWidgetState extends State<YearWidget> {
     }
 
   }
+  void retriveDeviceMaxNumber(List<DevicePrefix.Response>deviceData) {
+    var largestGeekValue = deviceData[0].todayREnergy;
+    var smallestGeekValue = deviceData[0].todayREnergy;
+
+    // Using forEach loop to find
+    // the largest and smallest
+    // numbers in the list
+    deviceData.forEach((gfg) => {
+      if (gfg.todayREnergy > largestGeekValue) {largestGeekValue = gfg.todayREnergy},
+      if (gfg.todayREnergy < smallestGeekValue) {smallestGeekValue = gfg.todayREnergy},
+    });
+
+    // Printing the values
+   // print("Smallest value in the list : $smallestGeekValue");
+  //  print("Largest value in the list : $largestGeekValue");
+
+    maximumInterval = largestGeekValue+2;
+
+  }
+
+  void retrivePlantMaxNumber(List<PlantPrefix.Response>plantData) {
+    var largestGeekValue = plantData[0].totalMEnergy;
+    var smallestGeekValue = plantData[0].totalMEnergy;
+
+    // Using forEach loop to find
+    // the largest and smallest
+    // numbers in the list
+    plantData.forEach((gfg) => {
+      if (gfg.totalMEnergy > largestGeekValue) {largestGeekValue = gfg.totalMEnergy},
+      if (gfg.totalMEnergy < smallestGeekValue) {smallestGeekValue = gfg.totalMEnergy},
+    });
+
+    // Printing the values
+   // print("Smallest value in the list : $smallestGeekValue");
+   // print("Largest value in the list : $largestGeekValue");
+
+    maximumInterval = largestGeekValue+2;
+
+  }
+
+
 }

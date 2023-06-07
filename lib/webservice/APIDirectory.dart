@@ -62,10 +62,10 @@ getDailyPlantChart(String userId,String date, String deviceId) {
 }
 
 getMonthlyPlantChart(String userId,String firstDate,String lastDate, String deviceId) {
-  return Uri.parse('${getBaseURL()}statistics/pMonthReport?userId=${userId}&startD=${firstDate}&endDate=${lastDate}&plantID=${deviceId}');
+  return Uri.parse('${getBaseURL()}statistics/pMonthreport?userId=${userId}&startD=${firstDate}&plantID=${deviceId}');
 }
+
 
 getYearlyPlantChart(String userId,String firstDate,String lastDate, String deviceId) {
   return Uri.parse('${getBaseURL()}statistics/pYearReport?userId=${userId}&strDate=${firstDate}&endDate=${lastDate}&plantID=${deviceId}');
 }
-//ShaktiGridTieInverter/statistics/pMonthReport?userId=2&startD=2023-05-29&plantID=122

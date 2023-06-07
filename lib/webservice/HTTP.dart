@@ -44,7 +44,7 @@ Future<Object?> get(url, [headers]) async {
     Map<String, String> requestHeaders = await setRequestHeaders(headers);
     var response = await http
         .get(url, headers: requestHeaders)
-        .timeout(const Duration(minutes: 2));
+        .timeout(const Duration(minutes: 5));
     return AccessPermissionHandler(response);
   } catch (e) {
     throw ExceptionHandlers().getExceptionString(e);
@@ -68,7 +68,7 @@ Future<Object?> post(url, data, [headers]) async {
           headers: requestHeaders,
           body: encodedData,
         )
-        .timeout(const Duration(minutes: 2));
+        .timeout(const Duration(minutes: 5));
     return AccessPermissionHandler(response);
   } catch (e) {
     throw ExceptionHandlers().getExceptionString(e);

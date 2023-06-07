@@ -28,6 +28,7 @@ class MonthWidget extends StatefulWidget {
 class _MonthWidgetState extends State<MonthWidget> {
   late List<DevicePrefix.Response> deviceData = [];
   late List<PlantPrefix.Response> plantData = [];
+
   late TooltipBehavior _tooltip;
   late DateTime SelectedDate, mindatime;
   bool isLoading = false;
@@ -44,7 +45,8 @@ class _MonthWidgetState extends State<MonthWidget> {
       firstMonthDate = "",
       lastMonthDate = "",
       dateFormat = "MM/dd/yyyy",
-      dateFormat2 = "MM-yyyy";
+      dateFormat2 = "MM-yyyy",  dateFormat3 = "yyyy-MM-dd";
+  double maximumInterval = 50;
 
   @override
   void initState() {
@@ -61,6 +63,7 @@ class _MonthWidgetState extends State<MonthWidget> {
           outputFormat.format(Utility().findFirstDateOfTheMonth(SelectedDate));
       lastMonthDate =
           outputFormat.format(Utility().findLastDateOfTheMonth(SelectedDate));
+
     });
     monthDataAPI();
   }
@@ -97,16 +100,16 @@ class _MonthWidgetState extends State<MonthWidget> {
         margin: const EdgeInsets.only(left: 20, right: 20),
         child: SfCartesianChart(
             primaryXAxis: CategoryAxis(),
-            primaryYAxis: widget.isPlant?NumericAxis(minimum: 0, maximum: 300, interval: 50):NumericAxis(minimum: 0, maximum: 50, interval: 10),
+            primaryYAxis:  widget.isPlant?NumericAxis(minimum: 0, maximum: maximumInterval, interval:maximumInterval/ 10):NumericAxis(minimum: 0, maximum: maximumInterval, interval: maximumInterval/10),
             tooltipBehavior: _tooltip,
             series: widget.isPlant?<ChartSeries<PlantPrefix.Response, String>>[
               ColumnSeries<PlantPrefix.Response, String>(
                   dataSource: plantData,
                   xValueMapper: (PlantPrefix.Response data, _) =>
-                      Utility().changeMonthFormate(data.dDate),
+                      Utility().changePlantMonthFormate(data.dDate),
                   yValueMapper: (PlantPrefix.Response data, _) => data.totalDEnergy,
                   name: 'Peak Energy',
-                  color: AppColor.themeColor)
+                  color: AppColor.chartColour)
             ]:<ChartSeries<DevicePrefix.Response, String>>[
               ColumnSeries<DevicePrefix.Response, String>(
                   dataSource: deviceData,
@@ -114,7 +117,7 @@ class _MonthWidgetState extends State<MonthWidget> {
                       Utility().changeMonthFormate(data.date1),
                   yValueMapper: (DevicePrefix.Response data, _) => data.todayREnergy,
                   name: 'Peak Energy',
-                  color: AppColor.themeColor)
+                  color: AppColor.chartColour)
             ]));
   }
 
@@ -224,46 +227,6 @@ class _MonthWidgetState extends State<MonthWidget> {
     );
   }
 
-  void _openDatePicker(BuildContext context) {
-    BottomPicker.date(
-      title: 'Select Date',
-      titleStyle: const TextStyle(
-        fontWeight: FontWeight.w800,
-        fontSize: 18,
-        color: AppColor.themeColor,
-      ),
-      onSubmit: (index) {
-        print(index);
-        SelectedDate = index;
-        var inputFormat = DateFormat('MM/dd/yyyy HH:mm');
-        SelectedDate = inputFormat.parse(
-            "${DateFormat('MM/dd/yyyy').format(index)} ${DateFormat('HH:mm').format(SelectedDate)}");
-        var outputFormat = DateFormat(dateFormat2);
-        setState(() {
-          selectedDateText = outputFormat.format(SelectedDate);
-        });
-      },
-      onClose: () {
-        print('Picker closed');
-      },
-      buttonText: confirm.toUpperCase(),
-      buttonTextStyle: const TextStyle(
-          color: AppColor.whiteColor,
-          fontSize: 14,
-          fontWeight: FontWeight.w800),
-      pickerTextStyle: const TextStyle(
-        color: AppColor.themeColor,
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-      ),
-      closeIconColor: AppColor.themeColor,
-      buttonSingleColor: AppColor.themeColor,
-      backgroundColor: AppColor.whiteColor,
-      initialDateTime: SelectedDate,
-      minDateTime: DateTime(2018, 1, 1),
-      maxDateTime: DateTime.now(),
-    ).show(context);
-  }
 
   SizedBox solarHouseDetailWidget() {
     return SizedBox(
@@ -282,11 +245,11 @@ class _MonthWidgetState extends State<MonthWidget> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                robotoTextWidget(
+                !widget.isPlant?robotoTextWidget(
                     textval: '$currentPower:- $currentPowerTxt',
                     colorval: AppColor.whiteColor,
                     sizeval: 12,
-                    fontWeight: FontWeight.w600),
+                    fontWeight: FontWeight.w600):SizedBox(),
                 robotoTextWidget(
                     textval: '$address:- $plantAddress',
                     colorval: AppColor.whiteColor,
@@ -427,7 +390,10 @@ class _MonthWidgetState extends State<MonthWidget> {
 
         todayIncomeTxt =
         '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
-      }
+
+
+        retriveDeviceMaxNumber(deviceData);
+
 
       setState(() {
         isLoading = false;
@@ -440,11 +406,13 @@ class _MonthWidgetState extends State<MonthWidget> {
       }
     }
   }
+  }
 
   void plantDataAPI() async{
-    final SharedPreferences sharedPreferences =
-    await SharedPreferences.getInstance();
-    var outputFormat = DateFormat(dateFormat2);
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    firstMonthDate = DateFormat(dateFormat3).format(DateFormat(dateFormat).parse(firstMonthDate));
+    lastMonthDate = DateFormat(dateFormat3).format(DateFormat(dateFormat).parse(lastMonthDate));
     dynamic res = await HTTP.get(getMonthlyPlantChart( sharedPreferences.getString(userID).toString(),
         firstMonthDate.toString(),
         lastMonthDate.toString(),
@@ -475,6 +443,9 @@ class _MonthWidgetState extends State<MonthWidget> {
 
         todayIncomeTxt =
         '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy}').toString()} INR';
+
+        retrivePlantMaxNumber(plantData);
+
       }
       setState(() {
         isLoading = false;
@@ -488,4 +459,45 @@ class _MonthWidgetState extends State<MonthWidget> {
     }
 
   }
+
+  void retriveDeviceMaxNumber(List<DevicePrefix.Response>deviceData) {
+    var largestGeekValue = deviceData[0].todayREnergy;
+    var smallestGeekValue = deviceData[0].todayREnergy;
+
+    // Using forEach loop to find
+    // the largest and smallest
+    // numbers in the list
+    deviceData.forEach((gfg) => {
+      if (gfg.todayREnergy > largestGeekValue) {largestGeekValue = gfg.todayREnergy},
+      if (gfg.todayREnergy < smallestGeekValue) {smallestGeekValue = gfg.todayREnergy},
+    });
+
+    // Printing the values
+  //  print("Smallest value in the list : $smallestGeekValue");
+  //  print("Largest value in the list : $largestGeekValue");
+
+    maximumInterval = largestGeekValue+2;
+
+  }
+
+  void retrivePlantMaxNumber(List<PlantPrefix.Response>plantData) {
+    var largestGeekValue = plantData[0].totalDEnergy;
+    var smallestGeekValue = plantData[0].totalDEnergy;
+
+    // Using forEach loop to find
+    // the largest and smallest
+    // numbers in the list
+    plantData.forEach((gfg) => {
+      if (gfg.totalDEnergy > largestGeekValue) {largestGeekValue = gfg.totalDEnergy},
+      if (gfg.totalDEnergy < smallestGeekValue) {smallestGeekValue = gfg.totalDEnergy},
+    });
+
+    // Printing the values
+    //print("Smallest value in the list : $smallestGeekValue");
+   // print("Largest value in the list : $largestGeekValue");
+
+    maximumInterval = largestGeekValue+2;
+
+  }
+
 }

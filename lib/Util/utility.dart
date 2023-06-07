@@ -114,6 +114,16 @@ class Utility {
     return outputDate;
   }
 
+  String changePlantMonthFormate(String date) {
+    var inputFormat = DateFormat("MM-dd-yyyy");
+    var inputDate = inputFormat.parse(date); // <-- dd/MM 24H format
+
+    var outputFormat = DateFormat('dd');
+    var outputDate = outputFormat.format(inputDate);
+
+    return outputDate;
+  }
+
   Future<String> isUserLogin() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if(sharedPreferences.get(userID)!=null && sharedPreferences.get(userID).toString().isNotEmpty){
