@@ -54,7 +54,7 @@ class _MonthWidgetState extends State<MonthWidget> {
   void initState() {
     // TODO: implement initState
 
-    _tooltip = TooltipBehavior(enable: true);
+    _tooltip = TooltipBehavior(enable: true,  format: "point.y kWh",);
     mindatime = DateTime.now();
     SelectedDate = mindatime;
     var outputFormat = DateFormat(dateFormat);

@@ -55,7 +55,7 @@ class _YearWidgetState extends State<YearWidget> {
     // TODO: implement initState
     super.initState();
 
-    _tooltip = TooltipBehavior(enable: true);
+    _tooltip = TooltipBehavior(enable: true,  format: "point.y kWh",);
     mindatime = DateTime.now();
     SelectedDate = mindatime;
     var outputFormat = DateFormat(dateFormat);

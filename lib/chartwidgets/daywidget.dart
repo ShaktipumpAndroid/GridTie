@@ -53,7 +53,7 @@ class _DayWidgetState extends State<DayWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _tooltip = TooltipBehavior(enable: true);
+    _tooltip = TooltipBehavior(enable: true,  format: "point.y W",);
     mindatime = DateTime.now();
     SelectedDate = mindatime;
     var outputFormat = DateFormat(dateFormat);
