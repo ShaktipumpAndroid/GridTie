@@ -1,4 +1,5 @@
 import 'dart:convert' as convert;
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:bottom_picker/bottom_picker.dart';
@@ -46,6 +47,7 @@ class _DayWidgetState extends State<DayWidget> {
   String dateFormat = "yyyy-MM-dd", dateFormat2 = "yyyy-MM-dd";
   bool isLoading = true;
   double maximumInterval = 50;
+  late ZoomPanBehavior zoomPanBehavior;
 
   @override
   void initState() {
@@ -59,6 +61,7 @@ class _DayWidgetState extends State<DayWidget> {
       selectedDateText = outputFormat.format(SelectedDate);
       changeDate = outputFormat.format(SelectedDate);
     });
+    zoomPanBehavior = ZoomPanBehavior(enablePinching: true);
     dailyDataAPI();
   }
 
@@ -95,12 +98,17 @@ class _DayWidgetState extends State<DayWidget> {
           primaryXAxis: CategoryAxis(),
           primaryYAxis:  widget.isPlant?NumericAxis(minimum: 0, maximum: maximumInterval, interval:maximumInterval/ 10):NumericAxis(minimum: 0, maximum: maximumInterval, interval: maximumInterval/10),
           tooltipBehavior: _tooltip,
+          zoomPanBehavior: zoomPanBehavior,
           series: widget.isPlant?<ChartSeries<PlantPrefix.Response, String>>[
             AreaSeries<PlantPrefix.Response, String>(
                 dataSource: plantData,
                 xValueMapper: (PlantPrefix.Response data, _) =>
                     Utility().changeTimeFormate1(data.dDate),
-                yValueMapper: (PlantPrefix.Response data, _) => data.current_Energy,
+                yValueMapper: (PlantPrefix.Response data, _) =>  data.current_Energy,
+                borderDrawMode: BorderDrawMode.all,
+                borderColor: AppColor.themeColor,
+                borderWidth: 2,
+                markerSettings: MarkerSettings(isVisible: true,height: 3,width: 3,color: AppColor.themeColor,borderColor: AppColor.themeColor,borderWidth: 1),
                 name: 'Peak Energy',
                 color: AppColor.chartColour)
           ]:<ChartSeries<DevicePrefix.Response, String>>[
@@ -109,6 +117,10 @@ class _DayWidgetState extends State<DayWidget> {
                 xValueMapper: (DevicePrefix.Response data, _) =>
                   Utility().changeTimeFormate1(data.date1),
                 yValueMapper: (DevicePrefix.Response data, _) => data.currentRPower,
+                borderDrawMode: BorderDrawMode.top,
+                borderColor: AppColor.themeColor,
+                borderWidth: 2,
+                markerSettings: MarkerSettings(isVisible: true,height: 3,width: 3,color: AppColor.themeColor,borderColor: AppColor.themeColor,borderWidth: 1),
                 name: 'Peak Energy',
                 color: AppColor.chartColour)
           ]),
@@ -389,16 +401,16 @@ class _DayWidgetState extends State<DayWidget> {
 
         plantAddress = chartData.response[chartData.response.length - 1].address;
 
-        currentPowerTxt = '${chartData.response[chartData.response.length - 1].currentRPower} kWh';
+        currentPowerTxt = '${chartData.response[chartData.response.length - 1].currentRPower.toStringAsFixed(2)} kWh';
 
-        totalEnergyTxt = '${chartData.response[chartData.response.length - 1].totalREnergy} kWh';
+        totalEnergyTxt = '${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)} kWh';
 
-        totalIncomeTxt = '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy}').toString()} INR';
+        totalIncomeTxt = '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)}').toString()} INR';
 
-        todayEnergyTxt = '${chartData.response[chartData.response.length - 1].todayREnergy} kWh';
+        todayEnergyTxt = '${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)} kWh';
 
         todayIncomeTxt =
-        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)}').toString()} INR';
 
         retriveDeviceMaxNumber(deviceData);
       }
@@ -434,14 +446,14 @@ class _DayWidgetState extends State<DayWidget> {
 
      //   currentPowerTxt = '${plantChartData.response[plantChartData.response.length - 1].currentRPower} kWh';
 
-        totalEnergyTxt = '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy} kWh';
+        totalEnergyTxt = '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)} kWh';
 
-        totalIncomeTxt = '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy}').toString()} INR';
+        totalIncomeTxt = '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)}').toString()} INR';
 
-        todayEnergyTxt = '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy} kWh';
+        todayEnergyTxt = '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)} kWh';
 
         todayIncomeTxt =
-        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)}').toString()} INR';
         retrivePlantMaxNumber(plantData);
       }
 

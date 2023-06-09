@@ -12,5 +12,5 @@ class AppColor {
   static const grey = Color(0xFFC9C9CB);
   static const greyBorder = Color(0xFFF3F3F5);
   static const darkGrey = Color(0xFF7B7E83);
-  static const chartColour = Color(0xFF1565C0);
+  static const chartColour = Color(0xFF81b5f1);
 }

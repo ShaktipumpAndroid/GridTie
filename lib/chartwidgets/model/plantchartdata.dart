@@ -50,12 +50,12 @@ class Response {
   });
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
-    totalPCapacity: json["total_PCapacity"]!=null?json["total_PCapacity"]?.toDouble():0.0,
-    totalMEnergy: json["total_PCapacity"]!=null?json["total_MEnergy"]?.toDouble():0.0,
+    totalPCapacity: json["total_PCapacity"]!=null?json["total_PCapacity"]:0,
+    totalMEnergy: json["total_PCapacity"]!=null?json["total_MEnergy"]?.round():0,
     address: json["total_PCapacity"]!=null?json["address"]:"",
     dDate: json["total_PCapacity"]!=null?json["d_date"]:"",
-    totalDEnergy: json["total_PCapacity"]!=null?json["total_DEnergy"]?.toDouble():0.0,
-    current_Energy: json["current_Energy"]!=null?json["current_Energy"]?.toDouble():0.0,
+    totalDEnergy: json["total_PCapacity"]!=null?json["total_DEnergy"]?.round():0,
+    current_Energy: json["current_Energy"]!=null?json["current_Energy"]:0,
   );
 
   Map<String, dynamic> toJson() => {

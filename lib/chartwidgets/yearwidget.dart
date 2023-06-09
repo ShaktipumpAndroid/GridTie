@@ -47,6 +47,8 @@ class _YearWidgetState extends State<YearWidget> {
       dateFormat2 = "yyyy";
 
   double maximumInterval = 50;
+  late ZoomPanBehavior zoomPanBehavior;
+
 
   @override
   void initState() {
@@ -63,6 +65,8 @@ class _YearWidgetState extends State<YearWidget> {
       yearFirstDate = '01/01/$selectedDateText';
       yearLastDate = '12/31/$selectedDateText';
     });
+
+    zoomPanBehavior = ZoomPanBehavior(enablePinching: true);
     yearDataAPI();
   }
 
@@ -100,6 +104,7 @@ class _YearWidgetState extends State<YearWidget> {
             primaryXAxis: CategoryAxis(),
             primaryYAxis:  widget.isPlant?NumericAxis(minimum: 0, maximum: maximumInterval, interval:maximumInterval/ 10):NumericAxis(minimum: 0, maximum: maximumInterval, interval: maximumInterval/10),
             tooltipBehavior: _tooltip,
+            zoomPanBehavior: zoomPanBehavior,
             series: widget.isPlant?<ChartSeries<PlantPrefix.Response, String>>[
               ColumnSeries<PlantPrefix.Response, String>(
                   dataSource: plantData,
@@ -361,21 +366,21 @@ class _YearWidgetState extends State<YearWidget> {
             chartData.response[chartData.response.length - 1].address;
 
         totalCapacityTxt =
-        '${chartData.response[chartData.response.length - 1].totalRCapacity}';
+        '${chartData.response[chartData.response.length - 1].totalRCapacity.toStringAsFixed(2)}';
 
         currentPowerTxt =
-        '${chartData.response[chartData.response.length - 1].currentRPower} kWh';
+        '${chartData.response[chartData.response.length - 1].currentRPower.toStringAsFixed(2)} kWh';
 
         totalEnergyTxt =
-        '${chartData.response[chartData.response.length - 1].totalREnergy} kWh';
+        '${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)} kWh';
 
         totalIncomeTxt =
-        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)}').toString()} INR';
 
         todayEnergyTxt =
-        '${chartData.response[chartData.response.length - 1].todayREnergy} kWh';
+        '${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)} kWh';
         todayIncomeTxt =
-        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)}').toString()} INR';
 
         retriveDeviceMaxNumber(deviceData);
 
@@ -413,21 +418,21 @@ class _YearWidgetState extends State<YearWidget> {
             plantChartData.response[plantChartData.response.length - 1].address;
 
         totalCapacityTxt =
-        '${plantChartData.response[plantChartData.response.length - 1].totalPCapacity}';
+        '${plantChartData.response[plantChartData.response.length - 1].totalPCapacity.toStringAsFixed(2)}';
 
      /*   currentPowerTxt =
         '${plantChartData.response[plantChartData.response.length - 1].currentRPower} kWh';*/
 
         totalEnergyTxt =
-        '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy} kWh';
+        '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)} kWh';
 
         totalIncomeTxt =
-        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)}').toString()} INR';
 
         todayEnergyTxt =
-        '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy} kWh';
+        '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)} kWh';
         todayIncomeTxt =
-        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)}').toString()} INR';
 
         retrivePlantMaxNumber(plantData);
       }

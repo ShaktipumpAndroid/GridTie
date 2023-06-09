@@ -47,11 +47,13 @@ class _MonthWidgetState extends State<MonthWidget> {
       dateFormat = "MM/dd/yyyy",
       dateFormat2 = "MM-yyyy",  dateFormat3 = "yyyy-MM-dd";
   double maximumInterval = 50;
+  late ZoomPanBehavior zoomPanBehavior;
+
 
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
+
     _tooltip = TooltipBehavior(enable: true);
     mindatime = DateTime.now();
     SelectedDate = mindatime;
@@ -65,7 +67,9 @@ class _MonthWidgetState extends State<MonthWidget> {
           outputFormat.format(Utility().findLastDateOfTheMonth(SelectedDate));
 
     });
+    zoomPanBehavior = ZoomPanBehavior(enablePinching: true);
     monthDataAPI();
+    super.initState();
   }
 
   @override
@@ -102,6 +106,7 @@ class _MonthWidgetState extends State<MonthWidget> {
             primaryXAxis: CategoryAxis(),
             primaryYAxis:  widget.isPlant?NumericAxis(minimum: 0, maximum: maximumInterval, interval:maximumInterval/ 10):NumericAxis(minimum: 0, maximum: maximumInterval, interval: maximumInterval/10),
             tooltipBehavior: _tooltip,
+            zoomPanBehavior: zoomPanBehavior,
             series: widget.isPlant?<ChartSeries<PlantPrefix.Response, String>>[
               ColumnSeries<PlantPrefix.Response, String>(
                   dataSource: plantData,
@@ -375,21 +380,21 @@ class _MonthWidgetState extends State<MonthWidget> {
             chartData.response[chartData.response.length - 1].address;
 
         totalCapacityTxt =
-        '${chartData.response[chartData.response.length - 1].totalRCapacity}';
+        '${chartData.response[chartData.response.length - 1].totalRCapacity.toStringAsFixed(2)}';
 
         currentPowerTxt =
-        '${chartData.response[chartData.response.length - 1].currentRPower} kWh';
+        '${chartData.response[chartData.response.length - 1].currentRPower.toStringAsFixed(2)} kWh';
 
         totalEnergyTxt =
-        '${chartData.response[chartData.response.length - 1].totalREnergy} kWh';
+        '${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)} kWh';
 
         totalIncomeTxt =
-        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)}').toString()} INR';
 
-        todayEnergyTxt = '${chartData.response[chartData.response.length - 1].todayREnergy} kWh';
+        todayEnergyTxt = '${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)} kWh';
 
         todayIncomeTxt =
-        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)}').toString()} INR';
 
 
         retriveDeviceMaxNumber(deviceData);
@@ -428,21 +433,21 @@ class _MonthWidgetState extends State<MonthWidget> {
             plantChartData.response[plantChartData.response.length - 1].address;
 
         totalCapacityTxt =
-        '${plantChartData.response[plantChartData.response.length - 1].totalPCapacity}';
+        '${plantChartData.response[plantChartData.response.length - 1].totalPCapacity.toStringAsFixed(2)}';
 
        /* currentPowerTxt =
         '${plantChartData.response[plantChartData.response.length - 1].currentRPower} kWh';*/
 
         totalEnergyTxt =
-        '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy} kWh';
+        '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)} kWh';
 
         totalIncomeTxt =
-        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)}').toString()} INR';
 
-        todayEnergyTxt = '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy} kWh';
+        todayEnergyTxt = '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)} kWh';
 
         todayIncomeTxt =
-        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy}').toString()} INR';
+        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)}').toString()} INR';
 
         retrivePlantMaxNumber(plantData);
 
@@ -476,7 +481,7 @@ class _MonthWidgetState extends State<MonthWidget> {
   //  print("Smallest value in the list : $smallestGeekValue");
   //  print("Largest value in the list : $largestGeekValue");
 
-    maximumInterval = largestGeekValue+2;
+    maximumInterval = largestGeekValue+2.toDouble();
 
   }
 
@@ -496,7 +501,7 @@ class _MonthWidgetState extends State<MonthWidget> {
     //print("Smallest value in the list : $smallestGeekValue");
    // print("Largest value in the list : $largestGeekValue");
 
-    maximumInterval = largestGeekValue+2;
+    maximumInterval = largestGeekValue+2.toDouble();
 
   }
 
