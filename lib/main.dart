@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:grid_tie/Util/utility.dart';
 import 'package:grid_tie/bottom_navigation/alert/alertdetailwidget.dart';
+import 'package:grid_tie/qr_scanner/qr_code_widget.dart';
 import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/theme/string.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: isLoggedIn == 'true' ? HomePage() : LoginPage(),
+      home: isLoggedIn == 'true' ? QRScannerWidget() : QRScannerWidget(),
     );
   }
 }
