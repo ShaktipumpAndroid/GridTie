@@ -68,7 +68,15 @@ class _PlantPageState extends State<PlantPage> {
                   plantListAPI();
                 },
               );
-            }));
+            }),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            // Add your onPressed code here!
+          },
+          label:robotoTextWidget(textval: addPlant, colorval: AppColor.whiteColor, sizeval: 12, fontWeight: FontWeight.bold),
+          icon: const Icon(Icons.add),
+          backgroundColor: AppColor.themeColor,
+        ));
   }
 
   Widget _buildPosts(BuildContext context) {
@@ -100,68 +108,74 @@ class _PlantPageState extends State<PlantPage> {
               ),
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
-            child: Container(
-                padding: const EdgeInsets.all(10),
-                child: Stack(children: <Widget>[
-                  Row(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Stack(
-                          children: <Widget>[
-                            SvgPicture.asset(
-                              'assets/svg/solartower.svg',
-                              width: 30,
-                              height: 30,
-                            ),
-                            Positioned(
-                              right: 0.0,
-                              bottom: 0.0,
-                              child: plantList[index].status == true
-                                  ? loadSVG('assets/svg/activedot.svg')
-                                  : loadSVG('assets/svg/deactivedot.svg'),
-                            )
-                          ],
+            child: Stack(children: [
+              Container(
+                  padding: const EdgeInsets.all(15),
+                  margin: EdgeInsets.only(right: 120),
+                  child: Stack(children: <Widget>[
+                    Row(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Stack(
+                            children: <Widget>[
+                              SvgPicture.asset(
+                                'assets/svg/solartower.svg',
+                                width: 30,
+                                height: 30,
+                              ),
+                              Positioned(
+                                right: 0.0,
+                                bottom: 0.0,
+                                child: plantList[index].status == true
+                                    ? loadSVG('assets/svg/activedot.svg')
+                                    : loadSVG('assets/svg/deactivedot.svg'),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Flexible(child: robotoTextWidget(
-                        textval: plantList[index].plantName,
-                        colorval: AppColor.blackColor,
-                        sizeval: 14.0,
-                        fontWeight: FontWeight.w600,
-                      )),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Flexible(child: robotoTextWidget(
+                          textval: plantList[index].plantName,
+                          colorval: AppColor.blackColor,
+                          sizeval: 14.0,
+                          fontWeight: FontWeight.w600,
+                        )),
+                      ],
+                    ),
 
-                     Row(
-                          children: [
-                          GestureDetector(
-                            onTap: (){
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>  ChartWidget(deviceId: plantList[index].pid.toString(),isPlant:true)),
-                                      (Route<dynamic> route) => true);
+                  ])),
+              Align(alignment: Alignment.centerRight,
+                child: Container(
+                  margin: EdgeInsets.only(top: 10,right: 10,bottom: 5),
+                  child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>  ChartWidget(deviceId: plantList[index].pid.toString(),isPlant:true)),
+                                (Route<dynamic> route) => true);
 
-                            },
-                            child: IconWidget('assets/svg/plantreports.svg',reports),
-                          ),
-                          const SizedBox(width: 5,),
-                          GestureDetector(
-                            onTap: (){
-                              Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>  DevicePage(plantId: plantList[index].pid.toString())),
-                                      (Route<dynamic> route) => true);
-                            },
-                            child: IconWidget('assets/svg/solardevice.svg',devices),
-                          ),
-                        ],),
-
-                    ],
-                  ),
-
-                ]))
+                      },
+                      child: IconWidget('assets/svg/plantreports.svg',reports),
+                    ),
+                    const SizedBox(width: 5,),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>  DevicePage(plantId: plantList[index].pid.toString())),
+                                (Route<dynamic> route) => true);
+                      },
+                      child: IconWidget('assets/svg/solardevice.svg',devices),
+                    ),
+                  ],),),),
+            ],)
         ),
     ]);
   }
