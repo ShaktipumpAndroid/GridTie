@@ -53,3 +53,6 @@ var submit = 'Submit';
 var forgotPassword = 'Forgot Password?';
 var dontHaveAccount = 'Don\u0027t have an account?';
 var register = 'Register';
+var addPlant = 'Add Plant';
+var addDevice = 'Add Device';
+var enterCode = 'Scan QR code \u002F Enter Code';//Unicode character

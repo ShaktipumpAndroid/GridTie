@@ -36,6 +36,9 @@ class _QRScannerPageState extends State<QRScannerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: robotoTextWidget(textval: addDevice,
+          colorval: AppColor.whiteColor,
+          sizeval: 16, fontWeight: FontWeight.w600),),
       body: Stack(
         children: [
           Column(
@@ -88,7 +91,7 @@ class _QRScannerPageState extends State<QRScannerWidget> {
                 child: Column(
                   children: <Widget>[
                     if (result != null) scannedQRText() else scannedQRText(),
-                    SizedBox(height: 20,),
+                    const SizedBox(height: 20,),
                     GestureDetector(
                         onTap: () {
                           //signIn();
@@ -192,13 +195,13 @@ class _QRScannerPageState extends State<QRScannerWidget> {
       child: TextField(
         controller: barCodeTextController,
         maxLines: 1,
-        decoration: const InputDecoration(
-            prefixIcon: Icon(
+        decoration:  InputDecoration(
+            prefixIcon: const Icon(
               Icons.qr_code_scanner,
               color: AppColor.themeColor,
             ),
-            hintText: 'Scan a code',
-            hintStyle: TextStyle(
+            hintText: enterCode,
+            hintStyle: const TextStyle(
                 color: Colors.black, fontSize: 14, fontFamily: 'Roboto'),
             border: InputBorder.none),
         keyboardType: TextInputType.emailAddress,
