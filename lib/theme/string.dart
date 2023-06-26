@@ -50,3 +50,6 @@ var offlinePlants = 'Offline Plants';
 var reports = 'Reports';
 var devices = 'Devices';
 var submit = 'Submit';
+var forgotPassword = 'Forgot Password?';
+var dontHaveAccount = 'Don\u0027t have an account?';
+var register = 'Register';
