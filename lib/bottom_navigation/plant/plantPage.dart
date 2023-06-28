@@ -10,11 +10,13 @@ import 'package:grid_tie/chartwidgets/chartwidget.dart';
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../Util/utility.dart';
 import '../../theme/color.dart';
 import '../../theme/string.dart';
 import '../../uiwidget/robotoTextWidget.dart';
 import '../../webservice/APIDirectory.dart';
 import '../../webservice/constant.dart';
+import 'add_plant_page.dart';
 
 class PlantPage extends StatefulWidget {
   const PlantPage({Key? key}) : super(key: key);
@@ -26,6 +28,7 @@ class PlantPage extends StatefulWidget {
 class _PlantPageState extends State<PlantPage> {
   bool isLoading = false;
   List<Response> plantList = [];
+   late int selectedIndex;
 
   @override
   void initState() {
@@ -71,7 +74,10 @@ class _PlantPageState extends State<PlantPage> {
             }),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            // Add your onPressed code here!
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (BuildContext context) => const AddPlantPage()),
+                    (Route<dynamic> route) => true);
           },
           label:robotoTextWidget(textval: addPlant, colorval: AppColor.whiteColor, sizeval: 12, fontWeight: FontWeight.bold),
           icon: const Icon(Icons.add),
@@ -109,9 +115,10 @@ class _PlantPageState extends State<PlantPage> {
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
             child: Stack(children: [
+
               Container(
                   padding: const EdgeInsets.all(15),
-                  margin: EdgeInsets.only(right: 120),
+                  margin: const EdgeInsets.only(right: 150),
                   child: Stack(children: <Widget>[
                     Row(
                       children: [
@@ -149,7 +156,7 @@ class _PlantPageState extends State<PlantPage> {
                   ])),
               Align(alignment: Alignment.centerRight,
                 child: Container(
-                  margin: EdgeInsets.only(top: 10,right: 10,bottom: 5),
+                  margin: const EdgeInsets.only(top: 10,right: 10,bottom: 5),
                   child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -174,6 +181,17 @@ class _PlantPageState extends State<PlantPage> {
                       },
                       child: IconWidget('assets/svg/solardevice.svg',devices),
                     ),
+                    GestureDetector(
+                      onTap: (){
+                        selectedIndex = index;
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) => dialogue_removePlant(context),
+                        );
+
+                      },
+                      child: IconWidget('assets/svg/delete.svg',deletePlant),
+                    )
                   ],),),),
             ],)
         ),
@@ -235,6 +253,90 @@ class _PlantPageState extends State<PlantPage> {
   }
 
 
+  Widget dialogue_removePlant(BuildContext context) {
+
+    return AlertDialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        content: Container(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: Text(
+                appName,
+                style: const TextStyle(
+                    color: AppColor.themeColor,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              removePlantConfirmation,
+              style: const TextStyle(
+                  color: AppColor.themeColor,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Flexible(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: AppColor.whiteColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // <-- Radius
+                      ),
+                    ),
+                    child: robotoTextWidget(
+                      textval: cancel,
+                      colorval: AppColor.darkGrey,
+                      sizeval: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+
+                      setState(() {
+                        plantList.removeAt(selectedIndex);
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: AppColor.themeColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // <-- Radius
+                      ),
+                    ),
+                    child: robotoTextWidget(
+                      textval: confirm,
+                      colorval: AppColor.whiteColor,
+                      sizeval: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ]),
+        ));
+  }
+
+
   Future<void> plantListAPI() async {
     if (mounted) {
       setState(() {
@@ -262,6 +364,26 @@ class _PlantPageState extends State<PlantPage> {
           isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> removePlantAPI() async {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    dynamic res = await HTTP
+        .delete(removePlant(plantList[selectedIndex].pid));
+    var jsonData = null;
+    if (res != null && res.statusCode != null && res.statusCode == 200) {
+      jsonData = convert.jsonDecode(res.body);
+      PlantListModel plantListModel = PlantListModel.fromJson(jsonData);
+      if (plantListModel.status.toString() == 'true') {
+
+         setState(() {
+           plantList.remove(selectedIndex);
+
+         });
+      }
+
     }
   }
 

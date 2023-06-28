@@ -43,7 +43,7 @@ class _QRScannerPageState extends State<QRScannerWidget> {
         children: [
           Column(
             children: <Widget>[
-              Expanded(flex: 3, child: _buildQrView(context)),
+              Expanded(flex: 1, child: _buildQrView(context)),
               Container(
                 color: Colors.black,
                 child: Row(
@@ -90,8 +90,9 @@ class _QRScannerPageState extends State<QRScannerWidget> {
                 flex: 1,
                 child: Column(
                   children: <Widget>[
-                    if (result != null) scannedQRText() else scannedQRText(),
-                    const SizedBox(height: 20,),
+                    scannedQRText() ,
+                    DeviceNameText(),
+                    const SizedBox(height: 50,),
                     GestureDetector(
                         onTap: () {
                           //signIn();
@@ -199,6 +200,37 @@ class _QRScannerPageState extends State<QRScannerWidget> {
             prefixIcon: const Icon(
               Icons.qr_code_scanner,
               color: AppColor.themeColor,
+            ),
+            hintText: enterCode,
+            hintStyle: const TextStyle(
+                color: Colors.black, fontSize: 14, fontFamily: 'Roboto'),
+            border: InputBorder.none),
+        keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.next,
+      ),
+    );
+  }
+
+  Container DeviceNameText() {
+    return Container(
+      margin: const EdgeInsets.only(left: 10, right: 10,top: 20),
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey.shade400,
+        ),
+        borderRadius: const BorderRadius.all(
+            Radius.circular(10) //                 <--- border radius here
+        ),
+      ),
+      child: TextField(
+        controller: barCodeTextController,
+        maxLines: 1,
+        decoration:  InputDecoration(
+            prefixIcon: SvgPicture.asset(
+              'assets/svg/solardevice.svg',
+              width: 30,
+              height: 30,
             ),
             hintText: enterCode,
             hintStyle: const TextStyle(
