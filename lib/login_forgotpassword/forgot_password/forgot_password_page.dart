@@ -1,3 +1,9 @@
+import 'dart:math';
+import 'package:grid_tie/login_forgotpassword/otppage/model/otpreponse.dart';
+import 'package:grid_tie/main.dart';
+import 'package:grid_tie/webservice/APIDirectory.dart';
+import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
+import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:grid_tie/theme/color.dart';
@@ -16,9 +22,9 @@ class ForgotPasswordPage extends StatefulWidget {
 
 class _RegisterMobileState extends State<ForgotPasswordPage> {
   bool isLoading = false, isScreenVisible = false;
-  bool isPasswordVisible = false;
-  TextEditingController confirmPassController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+
+  int _randomNumber1 = 0;
+
   TextEditingController mobileNoController = TextEditingController();
 
   @override
@@ -31,16 +37,26 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
                 textval: forgotPasswordTitle,
                 colorval: AppColor.whiteColor,
                 sizeval: 15,
-                fontWeight: FontWeight.w800)),
+                fontWeight: FontWeight.w800),
+          leading: IconButton(
+              icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );}
+          ),
+        ),
         body: SizedBox(
           child: Container(
             width: double.infinity,
-
             decoration: const BoxDecoration(color: AppColor.themeColor),
+
             child: Stack(
               children: [
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(
                       height: 20,
@@ -64,48 +80,52 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
                               borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(60),
                                   topRight: Radius.circular(60))),
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 80),
-                            child: Column(
-                              children: [
-                                robotoTextWidget(
-                                    textval: mobileNumberDesc,
-                                    colorval: Colors.grey,
-                                    sizeval: 12,
-                                    fontWeight: FontWeight.w600),
-                                MobileTextWdget(),
+                          child: SingleChildScrollView(
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 80),
+                              child: Column(
+                                children: [
+                                  robotoTextWidget(
+                                      textval: mobileNumberDesc,
+                                      colorval: Colors.grey,
+                                      sizeval: 12,
+                                      fontWeight: FontWeight.w600),
+                                  MobileTextWidget(),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Random random = Random();
+                                        _randomNumber1 = random.nextInt(9999 - 1000 )+1000;
 
-
-                                GestureDetector(
-                                    onTap: () {
-                                      signIn();
-                                    },
-                                    child: Container(
-                                      height: 50,
-                                      margin:
-                                      const EdgeInsets.symmetric(horizontal: 50),
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(50),
-                                          color: AppColor.themeColor),
-                                      child: Center(
-                                        child: isLoading
-                                            ? Container(
-                                          height: 30,
-                                          width: 30,
-                                          child: const CircularProgressIndicator(
-                                            color: AppColor.whiteColor,
-                                          ),
-                                        )
-                                            : robotoTextWidget(
-                                            textval: sendOTP,
-                                            colorval: Colors.white,
-                                            sizeval: 14,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    )),
-                              ],
+                                        print("Number===>${_randomNumber1.toString()}");
+                                        signIn();
+                                      },
+                                      child: Container(
+                                        height: 50,
+                                        margin:
+                                        const EdgeInsets.symmetric(horizontal: 50),
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(50),
+                                            color: AppColor.themeColor),
+                                        child: Center(
+                                          child: isLoading
+                                              ? const SizedBox(
+                                            height: 30,
+                                            width: 30,
+                                            child: CircularProgressIndicator(
+                                              color: AppColor.whiteColor,
+                                            ),
+                                          )
+                                              : robotoTextWidget(
+                                              textval: sendOTP,
+                                              colorval: Colors.white,
+                                              sizeval: 14,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      )),
+                                ],
+                              ),
                             ),
-                          )),
+                          ),),
                     )
                   ],
                 ),
@@ -115,9 +135,10 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
         ));
   }
 
-  Container MobileTextWdget() {
+  // ignore: non_constant_identifier_names
+  Container MobileTextWidget() {
     return Container(
-        margin: const EdgeInsets.only(left: 20,right: 20,top: 20,bottom: 35),
+        margin: const EdgeInsets.only(left: 20,right: 20,top: 20,bottom: 20),
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
@@ -237,7 +258,7 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
                       Navigator.of(context).pop();
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: AppColor.whiteColor,
+                      backgroundColor: AppColor.whiteColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12), // <-- Radius
                       ),
@@ -253,16 +274,17 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
                 Flexible(
                   child: ElevatedButton(
                     onPressed: () {
+                      Navigator.of(context).pop();
                       confirmotp(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: AppColor.themeColor,
+                      backgroundColor: AppColor.themeColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12), // <-- Radius
                       ),
                     ),
                     child: robotoTextWidget(
-                      textval: confirm,
+                      textval: OK,
                       colorval: AppColor.whiteColor,
                       sizeval: 14,
                       fontWeight: FontWeight.w600,
@@ -276,11 +298,39 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
   }
 
   Future<void> confirmotp(BuildContext context) async {
-    Utility().showToast("OTP Send SuccessFully");
 
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-            builder: (BuildContext context) => const EnterOTPPage()),
-        (Route<dynamic> route) => true);
+    sendOtpAPI();
+
+  }
+
+  Future<void> sendOtpAPI() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var jsonData = null;
+    dynamic response = await HTTP.get(sendOTPAPI(mobileNoController.text.toString(),_randomNumber1));
+    print(response.statusCode);
+    if (response != null && response.statusCode == 200) {
+      print("response==============>${response.body.toString()}");
+      setState(() {
+        isLoading = false;
+      });
+
+      jsonData = convert.jsonDecode(response.body);
+
+      OtpResponse otpResponse = OtpResponse.fromJson(jsonData);
+
+      if (otpResponse.status.compareTo("Success") == 0 ) {
+        Utility().showToast("OTP Send SuccessFully");
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (BuildContext context) =>  EnterOTPPage(otp: _randomNumber1, mobile: mobileNoController.text.toString())),
+                (Route<dynamic> route) => true);
+      } else {
+        Utility().showInSnackBar(value: otpResponse.description, context: context);
+
+      }
+    }
   }
 }

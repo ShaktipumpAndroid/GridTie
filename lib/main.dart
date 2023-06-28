@@ -1,4 +1,5 @@
 import 'dart:convert' as convert;
+import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,11 +8,11 @@ import 'package:grid_tie/login_forgotpassword/forgot_password/forgot_password_pa
 import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/theme/string.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
-import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home/homepage.dart';
 import 'login_forgotpassword/model/loginmodel.dart';
+import 'registeruser/registeruserpge.dart';
 import 'webservice/APIDirectory.dart';
 import 'webservice/constant.dart';
 
@@ -51,6 +52,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool isLoading = false, isScreenVisible = false;
   bool isPasswordVisible = false;
+
   TextEditingController emailUserNameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -58,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SizedBox(
-      child: Container(
+         child: Container(
         width: double.infinity,
         decoration: const BoxDecoration(color: AppColor.themeColor),
         child: Stack(
@@ -140,7 +142,8 @@ class _LoginPageState extends State<LoginPage> {
                                             sizeval: 14,
                                             fontWeight: FontWeight.bold),
                                   ),
-                                )),
+                                )
+                            ),
                           ],
                         ),
                       ),
@@ -249,10 +252,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  /* Navigator.of(context).pushAndRemoveUntil(
+                   Navigator.of(context).pushAndRemoveUntil(
                  MaterialPageRoute(
                      builder: (BuildContext context) => const RegisterUserPage()),
-                     (Route<dynamic> route) => true);*/
+                     (Route<dynamic> route) => true);
                 },
                 child: Container(
                   height: 30,
