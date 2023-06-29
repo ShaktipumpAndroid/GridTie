@@ -373,11 +373,12 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
 
     Map data = {
       "deviceNo": deviceList[selectedIndex].deviceNo,
+      "plantid": widget.plantId,
     };
 
     print("RemoveDeviceInput==============>${data.toString()}");
     var jsonData = null;
-    dynamic response = await HTTP.post(addPlantApi(), data);
+    dynamic response = await HTTP.post(removeDevice(), data);
     print(response.statusCode);
     if (response != null && response.statusCode == 200) {
       print("response==============>${response.body.toString()}");

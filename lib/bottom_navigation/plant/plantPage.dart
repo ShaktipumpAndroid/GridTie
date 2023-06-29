@@ -86,7 +86,7 @@ class _PlantPageState extends State<PlantPage>with WidgetsBindingObserver {
             }),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(builder:(context)=> AddPlantPage()))
+            Navigator.of(context).push(MaterialPageRoute(builder:(context)=> AddPlantPage(isRegister: false,)))
                 .then((value)=>{ plantListAPI()});
           },
           label: robotoTextWidget(
@@ -396,7 +396,7 @@ class _PlantPageState extends State<PlantPage>with WidgetsBindingObserver {
   }
 
   Future<void> removePlantAPI() async {
-    dynamic res = await HTTP.delete(removePlant(plantList[selectedIndex].pid));
+    dynamic res = await HTTP.get(removePlant(plantList[selectedIndex].pid));
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);

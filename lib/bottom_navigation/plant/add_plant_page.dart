@@ -3,6 +3,7 @@ import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:grid_tie/bottom_navigation/plant/model/globleModel.dart';
+import 'package:grid_tie/bottom_navigation/plant/plantPage.dart';
 import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/theme/string.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
@@ -11,11 +12,13 @@ import 'package:group_radio_button/group_radio_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Util/utility.dart';
+import '../../home/homepage.dart';
 import '../../webservice/APIDirectory.dart';
 import '../../webservice/constant.dart';
 
 class AddPlantPage extends StatefulWidget {
-  const AddPlantPage({Key? key}) : super(key: key);
+  bool isRegister;
+   AddPlantPage({Key? key,required this.isRegister}) : super(key: key);
 
   @override
   State<AddPlantPage> createState() => _PlantPageState();
@@ -473,7 +476,14 @@ class _PlantPageState extends State<AddPlantPage> {
 
       if (globleModel.status == true) {
         Utility().showToast(plantAddedSuccessfully);
-        Navigator.of(context).pop();
+         if(widget.isRegister){
+           Navigator.of(context).pushAndRemoveUntil(
+               MaterialPageRoute(
+                   builder: (BuildContext context) => const PlantPage()),
+                   (Route<dynamic> route) => false);
+         }else {
+           Navigator.of(context).pop();
+         }
       } else {
         Utility().showInSnackBar(value: globleModel.message, context: context);
       }

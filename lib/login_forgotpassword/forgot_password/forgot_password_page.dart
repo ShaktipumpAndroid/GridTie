@@ -43,7 +43,7 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
                 );}
           ),
         ),
@@ -84,19 +84,15 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
                             child: Container(
                               margin: const EdgeInsets.only(top: 80),
                               child: Column(
+
                                 children: [
-                                  robotoTextWidget(
-                                      textval: mobileNumberDesc,
-                                      colorval: Colors.grey,
-                                      sizeval: 12,
-                                      fontWeight: FontWeight.w600),
+                                  Text(mobileNumberDesc, textAlign: TextAlign.center,style: const TextStyle(color:Colors.grey,
+                                  fontSize: 12,fontWeight: FontWeight.w600)),
                                   MobileTextWidget(),
                                   GestureDetector(
                                       onTap: () {
                                         Random random = Random();
                                         _randomNumber1 = random.nextInt(9999 - 1000 )+1000;
-
-                                        print("Number===>${_randomNumber1.toString()}");
                                         signIn();
                                       },
                                       child: Container(
