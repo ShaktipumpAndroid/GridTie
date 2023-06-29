@@ -33,22 +33,9 @@ class _PlantPageState extends State<PlantPage>with WidgetsBindingObserver {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
      retrievePlantList();
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      retrievePlantList();
-    }
-  }
 
   void retrievePlantList() {
     Utility().checkInternetConnection().then((connectionResult) {
@@ -99,10 +86,8 @@ class _PlantPageState extends State<PlantPage>with WidgetsBindingObserver {
             }),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (BuildContext context) => const AddPlantPage()),
-                (Route<dynamic> route) => true);
+            Navigator.of(context).push(MaterialPageRoute(builder:(context)=> AddPlantPage()))
+                .then((value)=>{ plantListAPI()});
           },
           label: robotoTextWidget(
               textval: addPlant,
@@ -415,11 +400,13 @@ class _PlantPageState extends State<PlantPage>with WidgetsBindingObserver {
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
-      GlobleModel plantListModel = GlobleModel.fromJson(jsonData);
-      if (plantListModel.status.toString() == 'true') {
+      print("jsonData====>$jsonData");
+      GlobleModel globleModel = GlobleModel.fromJson(jsonData);
+      if (globleModel.status.toString() == 'true') {
         setState(() {
           plantList.removeAt(selectedIndex);
         });
+        Utility().showInSnackBar(value: plantDeleted,context: context);
       }
     }
   }

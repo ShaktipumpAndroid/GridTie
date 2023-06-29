@@ -27,8 +27,7 @@ class _PlantPageState extends State<AddPlantPage> {
   TextEditingController plantAddressController = TextEditingController();
   TextEditingController plantLatitudeController = TextEditingController();
   TextEditingController plantLongitudeController = TextEditingController();
-  String address = "",
-      selectedGridType = grid;
+  String address = "", selectedPlantType = grid;
 
   bool isLoading = false;
 
@@ -114,12 +113,12 @@ class _PlantPageState extends State<AddPlantPage> {
       margin: const EdgeInsets.only(left: 20, right: 20),
       child: RadioGroup<String>.builder(
           direction: Axis.horizontal,
-          groupValue: selectedGridType,
+          groupValue: selectedPlantType,
           activeColor: AppColor.whiteColor,
           horizontalAlignment: MainAxisAlignment.spaceEvenly,
           onChanged: (value) {
             setState(() {
-              selectedGridType = value.toString();
+              selectedPlantType = value.toString();
             });
           },
           items: _status,
@@ -450,11 +449,12 @@ class _PlantPageState extends State<AddPlantPage> {
     });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     Map data = {
-      "muId": sharedPreferences.getString(userID).toString(),
+      "userId": sharedPreferences.getString(userID).toString(),
       "plantName": plantNameController.text.toString(),
       "capacity": plantCapacityController.text.toString(),
       "plantAddress": plantAddressController.text.toString(),
       "latitude": plantLatitudeController.text.toString(),
+      "plant_type": selectedPlantType,
       "longitude": plantLongitudeController.text.toString(),
     };
 
@@ -479,7 +479,7 @@ class _PlantPageState extends State<AddPlantPage> {
       }
     } else {
       if (!mounted) return;
-      Utility().showInSnackBar(value: 'Unable To Add Plant', context: context);
+      Utility().showInSnackBar(value: unableToAddPlant, context: context);
     }
   }
 }
