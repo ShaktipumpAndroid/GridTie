@@ -62,10 +62,8 @@ class _DevicePageState extends State<DevicePage> {
       ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (BuildContext context) =>  QRScannerWidget(plantId: widget.plantId,)),
-                    (Route<dynamic> route) => true);
+            Navigator.of(context).push(MaterialPageRoute(builder:(context)=>  QRScannerWidget(plantId: widget.plantId)))
+                .then((value)=>{ setState(() {})});
           },
           label:robotoTextWidget(textval: addDevice, colorval: AppColor.whiteColor, sizeval: 12, fontWeight: FontWeight.bold),
           icon: const Icon(Icons.add),

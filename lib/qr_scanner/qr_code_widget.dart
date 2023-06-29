@@ -51,94 +51,95 @@ class _QRScannerPageState extends State<QRScannerWidget> {
             sizeval: 16,
             fontWeight: FontWeight.w600),
       ),
-      body: Stack(
-        children: [
-          Column(
-            children: <Widget>[
-              Expanded(flex: 3, child: _buildQrView(context)),
-              Container(
-                color: Colors.black,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () async {
-                        await controller?.toggleFlash();
-                        setState(() {
-                          if (isFlashOn) {
-                            isFlashOn = false;
-                          } else {
-                            isFlashOn = true;
-                          }
-                        });
-                      },
-                      icon: isFlashOn
-                          ? const Icon(
-                              Icons.flash_auto_sharp,
-                              color: AppColor.whiteColor,
-                            )
-                          : const Icon(Icons.flash_off_sharp,
-                              color: AppColor.whiteColor),
-                    ),
-                    IconButton(
-                      onPressed: () async {
-                        await controller?.flipCamera();
-                        setState(() {
-                          if (isCameraFlip) {
-                            isCameraFlip = false;
-                          } else {
-                            isCameraFlip = true;
-                          }
-                        });
-                      },
-                      icon: const Icon(Icons.flip_camera_android,
-                          color: AppColor.whiteColor),
-                    )
-                  ],
+      body: SingleChildScrollView(child:  Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+               height: MediaQuery.of(context).size.height/1.8,
+              child: _buildQrView(context)),
+          Container(
+            color: Colors.black,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () async {
+                    await controller?.toggleFlash();
+                    setState(() {
+                      if (isFlashOn) {
+                        isFlashOn = false;
+                      } else {
+                        isFlashOn = true;
+                      }
+                    });
+                  },
+                  icon: isFlashOn
+                      ? const Icon(
+                    Icons.flash_auto_sharp,
+                    color: AppColor.whiteColor,
+                  )
+                      : const Icon(Icons.flash_off_sharp,
+                      color: AppColor.whiteColor),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Column(
-                  children: <Widget>[
-                    scannedQRText(),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    GestureDetector(
-                        onTap: () {
-                          addDeviceValidation();
-                        },
-                        child: Container(
-                          height: 50,
-                          margin: const EdgeInsets.symmetric(horizontal: 50),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              color: AppColor.themeColor),
-                          child: Center(
-                            child: isLoading
-                                ? const SizedBox(
-                                    height: 30,
-                                    width: 30,
-                                    child: CircularProgressIndicator(
-                                      color: AppColor.whiteColor,
-                                    ),
-                                  )
-                                : robotoTextWidget(
-                                    textval: submit,
-                                    colorval: Colors.white,
-                                    sizeval: 14,
-                                    fontWeight: FontWeight.bold),
-                          ),
-                        )),
-                  ],
-                ),
-              )
-            ],
+                IconButton(
+                  onPressed: () async {
+                    await controller?.flipCamera();
+                    setState(() {
+                      if (isCameraFlip) {
+                        isCameraFlip = false;
+                      } else {
+                        isCameraFlip = true;
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.flip_camera_android,
+                      color: AppColor.whiteColor),
+                )
+              ],
+            ),
           ),
+          Container(
+
+            child: Column(
+              children: <Widget>[
+                scannedQRText(),
+                const SizedBox(
+                  height: 20,
+                ),
+                GestureDetector(
+                    onTap: () {
+                      addDeviceValidation();
+                    },
+                    child: Container(
+                      height: 50,
+                      margin: const EdgeInsets.symmetric(horizontal: 50),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: AppColor.themeColor),
+                      child: Center(
+                        child: isLoading
+                            ? const SizedBox(
+                          height: 30,
+                          width: 30,
+                          child: CircularProgressIndicator(
+                            color: AppColor.whiteColor,
+                          ),
+                        )
+                            : robotoTextWidget(
+                            textval: submit,
+                            colorval: Colors.white,
+                            sizeval: 14,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )),
+              ],
+            ),
+          )
         ],
-      ),
+      )),
+
+
     );
   }
 
@@ -279,7 +280,7 @@ class _QRScannerPageState extends State<QRScannerWidget> {
       setState(() {
         isLoading = false;
       });
-      Utility().showInSnackBar(value: 'Unable To Add Device', context: context);
+      Utility().showInSnackBar(value: unableToAddDevice, context: context);
     }
   }
 }
