@@ -10,6 +10,8 @@ const webBaseUrl = '$scheme://$host:$port';
 const mobileBaseUrl = '$scheme://$mobileHost:$port';
 
 const deployedLambdaUrl = "https://solar10.shaktisolarrms.com/ShaktiGridTieInverter/";
+const swagger1 = "http://solar10.shaktisolarrms.com:8385/";
+
 
 getBaseURL() {
   String baseUrl = deployedLambdaUrl;
@@ -33,14 +35,22 @@ getDashboardDetails(String userId) {
   return Uri.parse('${getBaseURL()}dashboard/list?userId=$userId');
 }
 
+addPlantApi() {
+  return Uri.parse('${swagger1}AddPlant');
+}
+removePlant(int Pid) {
+  return Uri.parse('${swagger1}RemovieUserPlant?Pid=$Pid');
+}
+
 getPlantList(String userId) {
   return Uri.parse('${getBaseURL()}plant/list?userId=$userId');
 }
 getFaultList(String userId) {
   return Uri.parse('${getBaseURL()}fault/checkFaultToday?userId=$userId');
 }
-
-
+addDeviceApi() {
+  return Uri.parse('${getBaseURL()}TDevice/add');
+}
 getDeviceList(String userId,String status,String plantId) {
   return Uri.parse('${getBaseURL()}TDevice/list?userId=$userId&status=$status&plant=$plantId');
 }

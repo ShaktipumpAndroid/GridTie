@@ -6,6 +6,7 @@ import 'package:grid_tie/bottom_navigation/plant/device/devicedetailwidget.dart'
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../Util/utility.dart';
 import '../../../theme/color.dart';
 import '../../../theme/string.dart';
 import '../../../uiwidget/robotoTextWidget.dart';
@@ -23,17 +24,31 @@ class DeviceListPage extends StatefulWidget {
   State<DeviceListPage> createState() => _DeviceListPageState();
 }
 
-class _DeviceListPageState extends State<DeviceListPage> {
+class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObserver {
   bool isLoading = false;
   List<Response> deviceList = [];
+  late int selectedIndex;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    deviceListAPI();
+    WidgetsBinding.instance.addObserver(this);
+    retrieveDeviceList();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      retrieveDeviceList();
+    }
+  }
   @override
   void setState(fn) {
     if (mounted) {
@@ -63,9 +78,8 @@ class _DeviceListPageState extends State<DeviceListPage> {
                     : _buildPosts(context)),
             onRefresh: () {
               return Future.delayed(
-                const Duration(seconds: 3),
-                () {
-                  deviceListAPI();
+                const Duration(seconds: 3), () {
+                  retrieveDeviceList();
                 },
               );
             }));
@@ -135,13 +149,7 @@ class _DeviceListPageState extends State<DeviceListPage> {
                       const SizedBox(
                         width: 10,
                       ),
-                      /*Flexible(
-                          child: robotoTextWidget(
-                            textval: deviceList[index].inverterType,
-                            colorval: AppColor.blackColor,
-                            sizeval: 12.0,
-                            fontWeight: FontWeight.w600,
-                          )),*/
+
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -161,7 +169,23 @@ class _DeviceListPageState extends State<DeviceListPage> {
                             fontWeight: FontWeight.normal,
                           ),
                         ],
+                      ),
+
+                      Container(
+
+                        child:   GestureDetector(
+                          onTap: (){
+                            selectedIndex = index;
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) => dialogue_removeDevice(context),
+                            );
+
+                          },
+                          child: IconWidget('assets/svg/delete.svg',deletePlant),
+                        ),
                       )
+
                     ],
                   ),
                 ]))),
@@ -209,6 +233,8 @@ class _DeviceListPageState extends State<DeviceListPage> {
     );
   }
 
+
+
   SizedBox NoDataFound() {
     return SizedBox(
         height: MediaQuery.of(context).size.height,
@@ -236,5 +262,116 @@ class _DeviceListPageState extends State<DeviceListPage> {
                 fontWeight: FontWeight.bold),
           ),
         )));
+  }
+
+  SizedBox IconWidget(String svg, String txt) {
+    return SizedBox(
+      width: 45,
+      child: Column(
+        children: [
+          SvgPicture.asset(
+            svg,
+            width: 25,
+            height: 25,
+          ),
+          const SizedBox(height: 5,),
+          robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 10, fontWeight: FontWeight.w400)
+        ],
+      ),
+    );
+  }
+
+
+  Widget dialogue_removeDevice(BuildContext context) {
+
+    return AlertDialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        content: Container(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: Text(
+                appName,
+                style: const TextStyle(
+                    color: AppColor.themeColor,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              removeDeviceConfirmation,
+              style: const TextStyle(
+                  color: AppColor.themeColor,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Flexible(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: AppColor.whiteColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // <-- Radius
+                      ),
+                    ),
+                    child: robotoTextWidget(
+                      textval: cancel,
+                      colorval: AppColor.darkGrey,
+                      sizeval: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+
+                      setState(() {
+                        deviceList.removeAt(selectedIndex);
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: AppColor.themeColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // <-- Radius
+                      ),
+                    ),
+                    child: robotoTextWidget(
+                      textval: confirm,
+                      colorval: AppColor.whiteColor,
+                      sizeval: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ]),
+        ));
+  }
+
+  void retrieveDeviceList() {
+    Utility().checkInternetConnection().then((connectionResult) {
+      if (connectionResult) {
+        deviceListAPI();
+      }else {
+        Utility()
+            .showInSnackBar(value: checkInternetConnection, context: context);
+      }});
   }
 }

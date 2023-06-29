@@ -57,6 +57,12 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: SizedBox(
@@ -142,8 +148,8 @@ class _LoginPageState extends State<LoginPage> {
                                             sizeval: 14,
                                             fontWeight: FontWeight.bold),
                                   ),
-                                )
-                            ),
+                                )),
+                            signupWidget()
                           ],
                         ),
                       ),
@@ -152,7 +158,6 @@ class _LoginPageState extends State<LoginPage> {
                 )
               ],
             ),
-            signupWidget()
           ],
         ),
       ),

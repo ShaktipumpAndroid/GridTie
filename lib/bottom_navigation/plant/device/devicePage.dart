@@ -64,7 +64,7 @@ class _DevicePageState extends State<DevicePage> {
           onPressed: () {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
-                    builder: (BuildContext context) => const QRScannerWidget()),
+                    builder: (BuildContext context) =>  QRScannerWidget(plantId: widget.plantId,)),
                     (Route<dynamic> route) => true);
           },
           label:robotoTextWidget(textval: addDevice, colorval: AppColor.whiteColor, sizeval: 12, fontWeight: FontWeight.bold),
