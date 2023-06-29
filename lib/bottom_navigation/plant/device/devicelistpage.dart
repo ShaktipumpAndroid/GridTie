@@ -13,6 +13,7 @@ import '../../../uiwidget/robotoTextWidget.dart';
 import '../../../webservice/APIDirectory.dart';
 import '../../../webservice/constant.dart';
 import '../device/model/devicelistmodel.dart';
+import '../model/globleModel.dart';
 
 class DeviceListPage extends StatefulWidget {
   String plantId, status;
@@ -33,22 +34,17 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+
     retrieveDeviceList();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      retrieveDeviceList();
-    }
-  }
+
   @override
   void setState(fn) {
     if (mounted) {
@@ -340,10 +336,8 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
+                      removeDeviceAPI();
 
-                      setState(() {
-                        deviceList.removeAt(selectedIndex);
-                      });
                     },
                     style: ElevatedButton.styleFrom(
                       primary: AppColor.themeColor,
@@ -374,4 +368,36 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
             .showInSnackBar(value: checkInternetConnection, context: context);
       }});
   }
+
+  Future<void> removeDeviceAPI() async {
+
+    Map data = {
+      "deviceNo": deviceList[selectedIndex].deviceNo,
+    };
+
+    print("RemoveDeviceInput==============>${data.toString()}");
+    var jsonData = null;
+    dynamic response = await HTTP.post(addPlantApi(), data);
+    print(response.statusCode);
+    if (response != null && response.statusCode == 200) {
+      print("response==============>${response.body.toString()}");
+
+      jsonData = convert.jsonDecode(response.body);
+      GlobleModel globleModel = GlobleModel.fromJson(jsonData);
+
+      if (globleModel.status == true) {
+        Utility().showInSnackBar(value: deviceDeleted,context: context);
+        setState(() {
+          deviceList.removeAt(selectedIndex);
+        });
+
+      } else {
+        Utility().showInSnackBar(value: globleModel.message, context: context);
+      }
+    } else {
+      if (!mounted) return;
+      Utility().showInSnackBar(value: unableToAddPlant, context: context);
+    }
+  }
+
 }

@@ -104,3 +104,7 @@ var removePlantConfirmation = "Are you sure want to remove this Plant?";
 var removeDeviceConfirmation = "Are you sure want to remove this Device?";
 var enterDeviceName = "Enter Device Name";
 var plantAddedSuccessfully = "Plant Added Successfully";
+var unableToAddPlant = "Unable To Add Plant";
+var unableToAddDevice = "Unable To Add Device";
+var deviceDeleted = "Device Deleted Successfully";
+var plantDeleted = "Plant Deleted Successfully";
