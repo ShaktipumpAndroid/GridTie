@@ -17,7 +17,7 @@ class robotoTextWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return  Text(
       textval,
-      textAlign: TextAlign.center,
+      textAlign: TextAlign.justify,
       overflow: TextOverflow.ellipsis,
       maxLines: 2,
       style: TextStyle(
