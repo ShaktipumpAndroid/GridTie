@@ -1,17 +1,18 @@
 import 'dart:convert' as convert;
+import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:grid_tie/Util/utility.dart';
-import 'package:grid_tie/bottom_navigation/plant/add_plant_page.dart';
+import 'package:grid_tie/login_forgotpassword/forgot_password/forgot_password_page.dart';
 import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/theme/string.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
-import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home/homepage.dart';
-import 'login/model/loginmodel.dart';
+import 'login_forgotpassword/model/loginmodel.dart';
+import 'registeruser/registeruserpge.dart';
 import 'webservice/APIDirectory.dart';
 import 'webservice/constant.dart';
 
@@ -51,6 +52,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool isLoading = false, isScreenVisible = false;
   bool isPasswordVisible = false;
+
   TextEditingController emailUserNameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -64,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SizedBox(
-      child: Container(
+         child: Container(
         width: double.infinity,
         decoration: const BoxDecoration(color: AppColor.themeColor),
         child: Stack(
@@ -215,9 +217,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   forgotPasswordWidget() {
-    return GestureDetector(
+    return InkWell(
         onTap: () {
-          signIn();
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      const ForgotPasswordPage()),
+              (Route<dynamic> route) => true);
+          //   signIn();
         },
         child: Container(
           height: 30,
@@ -248,15 +255,23 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 width: 5,
               ),
-              Container(
-                height: 30,
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: robotoTextWidget(
-                      textval: register,
-                      colorval: AppColor.themeColor,
-                      sizeval: 14,
-                      fontWeight: FontWeight.bold),
+              GestureDetector(
+                onTap: () {
+                   Navigator.of(context).pushAndRemoveUntil(
+                 MaterialPageRoute(
+                     builder: (BuildContext context) => const RegisterUserPage()),
+                     (Route<dynamic> route) => true);
+                },
+                child: Container(
+                  height: 30,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: robotoTextWidget(
+                        textval: register,
+                        colorval: AppColor.themeColor,
+                        sizeval: 14,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               )
             ],

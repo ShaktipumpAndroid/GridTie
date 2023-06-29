@@ -95,3 +95,15 @@ getYearlyPlantChart(
   return Uri.parse(
       '${getBaseURL()}statistics/pYearReport?userId=${userId}&strDate=${firstDate}&endDate=${lastDate}&plantID=${deviceId}');
 }
+
+sendOTPAPI(String mobile, int otp){
+  return Uri.parse('http://control.yourbulksms.com/api/sendhttp.php?authkey=393770756d707334373701&mobiles=${mobile}&message=Please%20Enter%20Following%20OTP%20To%20Reset%20Your%20Password%20${otp}%20SHAKTI%20GROUP&sender=SHAKTl&route=2&unicode=0&country=91&DLT_TE_ID=1707161726018508169');
+}
+
+registerUserApi(){
+  return Uri.parse('${getBaseURL()}gt_user/register');
+}
+
+updatePasswordApi(){
+  return Uri.parse('https://solar10.shaktisolarrms.com/ShaktiGridTieInverter1/gt_user/resetMPass');
+}
