@@ -1,3 +1,5 @@
+import 'dart:convert' as convert;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:grid_tie/login_forgotpassword/forgot_password/forgot_password_page.dart';
@@ -6,15 +8,15 @@ import 'package:grid_tie/main.dart';
 import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/theme/string.dart';
 import 'package:grid_tie/webservice/APIDirectory.dart';
-
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
-import 'dart:convert' as convert;
+
 import '../../Util/utility.dart';
 import '../../uiwidget/robotoTextWidget.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   String mobileNumber;
-   ResetPasswordPage({Key? key, required this.mobileNumber}) : super(key: key);
+
+  ResetPasswordPage({Key? key, required this.mobileNumber}) : super(key: key);
 
   @override
   State<ResetPasswordPage> createState() => _ForgetPasswordPageState();
@@ -29,7 +31,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return new WillPopScope(
+    return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
           appBar: AppBar(
@@ -45,7 +47,6 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
             child: Container(
               width: double.infinity,
               decoration: const BoxDecoration(color: AppColor.themeColor),
-
               child: Stack(
                 children: [
                   Column(
@@ -68,7 +69,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
                       Expanded(
                         child: Container(
                             width: double.infinity,
-                            height: MediaQuery.of(context).size.height/2,
+                            height: MediaQuery.of(context).size.height / 2,
                             decoration: const BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.only(
@@ -79,40 +80,39 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
                                 margin: const EdgeInsets.only(top: 80),
                                 child: Column(
                                   children: [
-                                    robotoTextWidget(
-                                        textval: resetPasswordDesc,
-                                        colorval: Colors.grey,
-                                        sizeval: 12,
-                                        fontWeight: FontWeight.w600),
+                                    Text(resetPasswordDesc, textAlign: TextAlign.center,style: const TextStyle(color:Colors.grey,
+                                        fontSize: 12,fontWeight: FontWeight.w600)),
                                     PasswordTextWdget(),
                                     editMobileWidget(),
                                     GestureDetector(
-                                        onTap: () {
-                                          signIn();
-                                        },
-                                        child: Container(
-                                          height: 50,
-                                          margin:
-                                          const EdgeInsets.symmetric(horizontal: 50),
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(50),
-                                              color: AppColor.themeColor),
-                                          child: Center(
-                                            child: isLoading
-                                                ? Container(
-                                              height: 30,
-                                              width: 30,
-                                              child: const CircularProgressIndicator(
-                                                color: AppColor.whiteColor,
-                                              ),
-                                            )
-                                                : robotoTextWidget(
-                                                textval: change,
-                                                colorval: Colors.white,
-                                                sizeval: 14,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                      onTap: () {
+                                        signIn();
+                                      },
+                                      child: Container(
+                                        height: 50,
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 50),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            color: AppColor.themeColor),
+                                        child: Center(
+                                          child: isLoading
+                                              ? Container(
+                                                  height: 30,
+                                                  width: 30,
+                                                  child:
+                                                      const CircularProgressIndicator(
+                                                    color: AppColor.whiteColor,
+                                                  ),
+                                                )
+                                              : robotoTextWidget(
+                                                  textval: change,
+                                                  colorval: Colors.white,
+                                                  sizeval: 14,
+                                                  fontWeight: FontWeight.bold),
                                         ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -130,7 +130,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
 
   Container PasswordTextWdget() {
     return Container(
-      margin: const EdgeInsets.only(left: 20,right: 20,top: 20,bottom: 20),
+      margin: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
@@ -142,11 +142,12 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
           ]),
       child: Column(
         children: <Widget>[
-
           Container(
-            padding: const EdgeInsets.only(left: 10, top: 5,bottom: 5,right: 5),
+            padding:
+                const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
             decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey.shade200))),
+                border:
+                    Border(bottom: BorderSide(color: Colors.grey.shade200))),
             child: TextField(
               controller: confirmPassController,
               maxLines: 1,
@@ -158,14 +159,14 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
               textInputAction: TextInputAction.next,
             ),
           ),
-
           Container(
-            padding: const EdgeInsets.only(left: 10, top: 5,bottom: 5,right: 5),
+            padding:
+                const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
             decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey.shade200))),
+                border:
+                    Border(bottom: BorderSide(color: Colors.grey.shade200))),
             child: TextField(
               controller: passwordController,
-
               obscureText: !isPasswordVisible,
               decoration: InputDecoration(
                 hintText: confimpassword,
@@ -177,7 +178,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
                       : Icons.visibility_off),
                   onPressed: () {
                     setState(
-                          () {
+                      () {
                         isPasswordVisible = !isPasswordVisible;
                       },
                     );
@@ -195,52 +196,53 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
 
   Container editMobileWidget() {
     return Container(
-        height: 45,
-        margin: const EdgeInsets.all(10),
-
-        child:  Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            robotoTextWidget(textval: editMobile, colorval:  Colors.grey, sizeval: 12, fontWeight: FontWeight.normal),
-            SizedBox(
-              width: 5,
-            ),
-            InkWell(
-              child: robotoTextWidget(textval: edit, colorval: AppColor.themeColor, sizeval: 12, fontWeight: FontWeight.normal),
-              onTap: (){
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => const ForgotPasswordPage()),
-                        (Route<dynamic> route) => true);
-
-              },
-            ),
-
-          ],
-        ) ,
+      height: 45,
+      margin: const EdgeInsets.all(10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          robotoTextWidget(
+              textval: editMobile,
+              colorval: Colors.grey,
+              sizeval: 12,
+              fontWeight: FontWeight.normal),
+          const SizedBox(
+            width: 5,
+          ),
+          InkWell(
+            child: robotoTextWidget(
+                textval: edit,
+                colorval: AppColor.themeColor,
+                sizeval: 12,
+                fontWeight: FontWeight.normal),
+            onTap: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          const ForgotPasswordPage()),
+                  (Route<dynamic> route) => true);
+            },
+          ),
+        ],
+      ),
     );
   }
-  Future<void> signIn() async {
 
+  Future<void> signIn() async {
     Utility().checkInternetConnection().then((connectionResult) {
       if (connectionResult) {
-       if (confirmPassController.text
-            .toString()
-            .isEmpty) {
-          Utility()
-              .showInSnackBar(value: passwordMessage, context: context);
-        }else if (passwordController.text
-            .toString()
-            .isEmpty) {
-          Utility().showInSnackBar(
-              value: confirmPasswordMessage, context: context);
-        } else if(confirmPassController.text.compareTo(passwordController.text) != 0) {
-
-          Utility().showInSnackBar(
-              value: passwordNotMatch, context: context);
-
-        } else{
-            updatePassword();
+         if (passwordController.text.toString().isEmpty) {
+          Utility().showInSnackBar(value: confirmPasswordMessage, context: context);
+        }else if (passwordController.text.toString().length<8) {
+          Utility().showInSnackBar(value: passwordLengthValidation, context: context);
+        }else if (confirmPassController.text.toString().isEmpty) {
+           Utility().showInSnackBar(value: passwordMessage, context: context);
+         }else if (confirmPassController.text.toString().length<8) {
+           Utility().showInSnackBar(value: confirmPasswordValidation, context: context);
+         }  else if (confirmPassController.text.compareTo(passwordController.text) != 0) {
+          Utility().showInSnackBar(value: passwordNotMatch, context: context);
+        } else {
+          updatePassword();
           // loginAPI();
         }
       } else {
@@ -248,7 +250,6 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
             .showInSnackBar(value: checkInternetConnection, context: context);
       }
     });
-
   }
 
   Future<void> updatePassword() async {
@@ -263,7 +264,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
 
     print("RegisterInput==============>${data.toString()}");
     var jsonData = null;
-    dynamic response = await HTTP.put(updatePasswordApi(),data);
+    dynamic response = await HTTP.put(updatePasswordApi(), data);
     print(response.statusCode);
     if (response != null && response.statusCode == 200) {
       print("response==============>${response.body.toString()}");
@@ -273,20 +274,19 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
 
       jsonData = convert.jsonDecode(response.body);
 
-      UpdatePasswordResponse updatePasswordResponse = UpdatePasswordResponse.fromJson(jsonData);
+      UpdatePasswordResponse updatePasswordResponse =
+          UpdatePasswordResponse.fromJson(jsonData);
 
       if (updatePasswordResponse.status) {
         Utility().showToast(updatePasswordResponse.message);
 
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-                builder: (BuildContext context) =>
-                const LoginPage()),
-                (Route<dynamic> route) => true);
+                builder: (BuildContext context) => const LoginPage()),
+            (Route<dynamic> route) => true);
       } else {
         Utility().showToast(updatePasswordResponse.message);
       }
     }
   }
-
 }

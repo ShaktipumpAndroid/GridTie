@@ -108,11 +108,8 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                               margin: const EdgeInsets.only(top: 80),
                               child: Column(
                                 children: [
-                                  robotoTextWidget(
-                                      textval: verfiyOTP,
-                                      colorval: Colors.grey,
-                                      sizeval: 12,
-                                      fontWeight: FontWeight.w600),
+                                  Text(verfiyOTP, textAlign: TextAlign.center,style: const TextStyle(color:Colors.grey,
+                                      fontSize: 12,fontWeight: FontWeight.w600)),
                                   otpTextWidget(),
                                   resendOtpTimeWidget(),
                                   GestureDetector(

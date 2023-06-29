@@ -25,7 +25,7 @@ getBaseURL() {
 }
 
 removePlant(int Pid) {
-  return Uri.parse('${swagger1}RemovieUserPlant?Pid=$Pid');
+  return Uri.parse('${getBaseURL()}plant/delete/$Pid');
 }
 
 userLogin() {
