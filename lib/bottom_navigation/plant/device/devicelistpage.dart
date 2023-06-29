@@ -6,6 +6,7 @@ import 'package:grid_tie/bottom_navigation/plant/device/devicedetailwidget.dart'
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../Util/utility.dart';
 import '../../../theme/color.dart';
 import '../../../theme/string.dart';
 import '../../../uiwidget/robotoTextWidget.dart';
@@ -23,7 +24,7 @@ class DeviceListPage extends StatefulWidget {
   State<DeviceListPage> createState() => _DeviceListPageState();
 }
 
-class _DeviceListPageState extends State<DeviceListPage> {
+class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObserver {
   bool isLoading = false;
   List<Response> deviceList = [];
   late int selectedIndex;
@@ -32,9 +33,22 @@ class _DeviceListPageState extends State<DeviceListPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    deviceListAPI();
+    WidgetsBinding.instance.addObserver(this);
+    retrieveDeviceList();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      retrieveDeviceList();
+    }
+  }
   @override
   void setState(fn) {
     if (mounted) {
@@ -64,9 +78,8 @@ class _DeviceListPageState extends State<DeviceListPage> {
                     : _buildPosts(context)),
             onRefresh: () {
               return Future.delayed(
-                const Duration(seconds: 3),
-                () {
-                  deviceListAPI();
+                const Duration(seconds: 3), () {
+                  retrieveDeviceList();
                 },
               );
             }));
@@ -158,17 +171,21 @@ class _DeviceListPageState extends State<DeviceListPage> {
                         ],
                       ),
 
-                      GestureDetector(
-                        onTap: (){
-                          selectedIndex = index;
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) => dialogue_removeDevice(context),
-                          );
+                      Container(
 
-                        },
-                        child: IconWidget('assets/svg/delete.svg',deletePlant),
+                        child:   GestureDetector(
+                          onTap: (){
+                            selectedIndex = index;
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) => dialogue_removeDevice(context),
+                            );
+
+                          },
+                          child: IconWidget('assets/svg/delete.svg',deletePlant),
+                        ),
                       )
+
                     ],
                   ),
                 ]))),
@@ -249,13 +266,13 @@ class _DeviceListPageState extends State<DeviceListPage> {
 
   SizedBox IconWidget(String svg, String txt) {
     return SizedBox(
-      width: 50,
+      width: 45,
       child: Column(
         children: [
           SvgPicture.asset(
             svg,
-            width: 30,
-            height: 30,
+            width: 25,
+            height: 25,
           ),
           const SizedBox(height: 5,),
           robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 10, fontWeight: FontWeight.w400)
@@ -346,5 +363,15 @@ class _DeviceListPageState extends State<DeviceListPage> {
             )
           ]),
         ));
+  }
+
+  void retrieveDeviceList() {
+    Utility().checkInternetConnection().then((connectionResult) {
+      if (connectionResult) {
+        deviceListAPI();
+      }else {
+        Utility()
+            .showInSnackBar(value: checkInternetConnection, context: context);
+      }});
   }
 }

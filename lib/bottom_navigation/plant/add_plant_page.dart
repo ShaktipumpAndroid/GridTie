@@ -1,13 +1,15 @@
+import 'dart:convert' as convert;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:grid_tie/bottom_navigation/plant/model/AddPlantModel.dart';
+import 'package:grid_tie/bottom_navigation/plant/model/globleModel.dart';
 import 'package:grid_tie/theme/color.dart';
 import 'package:grid_tie/theme/string.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
+import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:group_radio_button/group_radio_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert' as convert;
-import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
+
 import '../../Util/utility.dart';
 import '../../webservice/APIDirectory.dart';
 import '../../webservice/constant.dart';
@@ -467,18 +469,17 @@ class _PlantPageState extends State<AddPlantPage> {
       });
 
       jsonData = convert.jsonDecode(response.body);
-      AddPlantModel addPlantModel = AddPlantModel.fromJson(jsonData);
+      GlobleModel globleModel = GlobleModel.fromJson(jsonData);
 
-      if (addPlantModel.status == true && addPlantModel.response != null && addPlantModel.response.toString().isNotEmpty) {
-
-        print("response==============>${response.body.toString()}");
+      if (globleModel.status == true) {
+        Utility().showToast(plantAddedSuccessfully);
         Navigator.of(context).pop();
       } else {
-        Utility().showInSnackBar(value: addPlantModel.message, context: context);
+        Utility().showInSnackBar(value: globleModel.message, context: context);
       }
     } else {
       if (!mounted) return;
-      Utility().showInSnackBar(value: 'Unable To Login', context: context);
+      Utility().showInSnackBar(value: 'Unable To Add Plant', context: context);
     }
   }
 }

@@ -1,17 +1,24 @@
+import 'dart:convert' as convert;
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:grid_tie/Util/utility.dart';
+import 'package:grid_tie/bottom_navigation/plant/model/globleModel.dart';
 import 'package:grid_tie/theme/color.dart';
+import 'package:grid_tie/webservice/APIDirectory.dart';
+import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
 
 class QRScannerWidget extends StatefulWidget {
-  const QRScannerWidget({Key? key}) : super(key: key);
+  String plantId;
+
+  QRScannerWidget({Key? key, required this.plantId}) : super(key: key);
 
   @override
   State<QRScannerWidget> createState() => _QRScannerPageState();
@@ -22,6 +29,7 @@ class _QRScannerPageState extends State<QRScannerWidget> {
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   TextEditingController barCodeTextController = TextEditingController();
+  TextEditingController deviceNameController = TextEditingController();
   bool isFlashOn = false, isCameraFlip = false, isLoading = false;
 
   @override
@@ -36,14 +44,18 @@ class _QRScannerPageState extends State<QRScannerWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: robotoTextWidget(textval: addDevice,
-          colorval: AppColor.whiteColor,
-          sizeval: 16, fontWeight: FontWeight.w600),),
+      appBar: AppBar(
+        title: robotoTextWidget(
+            textval: addDevice,
+            colorval: AppColor.whiteColor,
+            sizeval: 16,
+            fontWeight: FontWeight.w600),
+      ),
       body: Stack(
         children: [
           Column(
             children: <Widget>[
-              Expanded(flex: 1, child: _buildQrView(context)),
+              Expanded(flex: 3, child: _buildQrView(context)),
               Container(
                 color: Colors.black,
                 child: Row(
@@ -90,12 +102,13 @@ class _QRScannerPageState extends State<QRScannerWidget> {
                 flex: 1,
                 child: Column(
                   children: <Widget>[
-                    scannedQRText() ,
-                    DeviceNameText(),
-                    const SizedBox(height: 50,),
+                    scannedQRText(),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     GestureDetector(
                         onTap: () {
-                          //signIn();
+                          addDeviceValidation();
                         },
                         child: Container(
                           height: 50,
@@ -183,7 +196,7 @@ class _QRScannerPageState extends State<QRScannerWidget> {
 
   Container scannedQRText() {
     return Container(
-      margin: const EdgeInsets.only(left: 10, right: 10,top: 20),
+      margin: const EdgeInsets.only(left: 10, right: 10, top: 20),
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         border: Border.all(
@@ -196,7 +209,7 @@ class _QRScannerPageState extends State<QRScannerWidget> {
       child: TextField(
         controller: barCodeTextController,
         maxLines: 1,
-        decoration:  InputDecoration(
+        decoration: InputDecoration(
             prefixIcon: const Icon(
               Icons.qr_code_scanner,
               color: AppColor.themeColor,
@@ -205,38 +218,7 @@ class _QRScannerPageState extends State<QRScannerWidget> {
             hintStyle: const TextStyle(
                 color: Colors.black, fontSize: 14, fontFamily: 'Roboto'),
             border: InputBorder.none),
-        keyboardType: TextInputType.emailAddress,
-        textInputAction: TextInputAction.next,
-      ),
-    );
-  }
-
-  Container DeviceNameText() {
-    return Container(
-      margin: const EdgeInsets.only(left: 10, right: 10,top: 20),
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.grey.shade400,
-        ),
-        borderRadius: const BorderRadius.all(
-            Radius.circular(10) //                 <--- border radius here
-        ),
-      ),
-      child: TextField(
-        controller: barCodeTextController,
-        maxLines: 1,
-        decoration:  InputDecoration(
-            prefixIcon: SvgPicture.asset(
-              'assets/svg/solardevice.svg',
-              width: 30,
-              height: 30,
-            ),
-            hintText: enterCode,
-            hintStyle: const TextStyle(
-                color: Colors.black, fontSize: 14, fontFamily: 'Roboto'),
-            border: InputBorder.none),
-        keyboardType: TextInputType.emailAddress,
+        keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
       ),
     );
@@ -248,5 +230,56 @@ class _QRScannerPageState extends State<QRScannerWidget> {
       width: 20,
       height: 20,
     );
+  }
+
+  void addDeviceValidation() {
+    if (barCodeTextController.text.isEmpty) {
+      Utility().showInSnackBar(value: enterCode, context: context);
+    } else {
+      Utility().checkInternetConnection().then((connectionResult) {
+        if (connectionResult) {
+          AddDeviceAPI();
+        } else {
+          Utility()
+              .showInSnackBar(value: checkInternetConnection, context: context);
+        }
+      });
+    }
+  }
+
+  Future<void> AddDeviceAPI() async {
+    setState(() {
+      isLoading = true;
+    });
+    Map data = {
+      "plantid": widget.plantId,
+      "deviceNo": barCodeTextController.text.toString(),
+    };
+
+    print("AddDeviceInput==============>${data.toString()}");
+    var jsonData = null;
+    dynamic response = await HTTP.post(addDeviceApi(), data);
+    print(response.statusCode);
+    if (response != null && response.statusCode == 200) {
+      print("response==============>${response.body.toString()}");
+      setState(() {
+        isLoading = false;
+      });
+      jsonData = convert.jsonDecode(response.body);
+      GlobleModel globleModel = GlobleModel.fromJson(jsonData);
+
+      if (globleModel.status == true) {
+        print("response==============>${response.body.toString()}");
+        Navigator.of(context).pop();
+      } else {
+        Utility().showInSnackBar(value: globleModel.message, context: context);
+      }
+    } else {
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+      });
+      Utility().showInSnackBar(value: 'Unable To Add Device', context: context);
+    }
   }
 }
