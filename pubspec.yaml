@@ -45,6 +45,11 @@ dependencies:
   shared_preferences: any
   fluttertoast: ^8.0.9
   url_launcher: ^6.1.11
+  qr_code_scanner: ^1.0.1
+  permission_handler: ^10.0.0
+
+  group_radio_button: ^1.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

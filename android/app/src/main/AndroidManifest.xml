@@ -2,6 +2,8 @@
     package="com.example.grid_tie">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+
    <application
         android:label="Grid Tie"
         android:name="${applicationName}"

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
-
 import '../bottom_navigation/alert/alertPage.dart';
 import '../bottom_navigation/dashboard/dashboardPage.dart';
 import '../bottom_navigation/plant/plantPage.dart';
@@ -32,6 +31,15 @@ class _HomePageState extends State<HomePage> {
       super.setState(fn);
     }
   }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
+
+
 
 
   @override
