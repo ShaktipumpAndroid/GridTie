@@ -1,6 +1,4 @@
 import 'dart:convert' as convert;
-import 'dart:ffi';
-import 'dart:math';
 
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/material.dart';
@@ -11,16 +9,16 @@ import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+
 import '../Util/utility.dart';
 import '../theme/color.dart';
 import '../theme/string.dart';
 import '../webservice/APIDirectory.dart';
 import '../webservice/constant.dart';
 
-
-
 class DayWidget extends StatefulWidget {
-  DayWidget({Key? key, required this.deviceId,required this.isPlant}) : super(key: key);
+  DayWidget({Key? key, required this.deviceId, required this.isPlant})
+      : super(key: key);
   String deviceId;
   bool isPlant;
 
@@ -53,7 +51,10 @@ class _DayWidgetState extends State<DayWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _tooltip = TooltipBehavior(enable: true,  format: "point.y W",);
+    _tooltip = TooltipBehavior(
+      enable: true,
+      format: "point.y W",
+    );
     mindatime = DateTime.now();
     SelectedDate = mindatime;
     var outputFormat = DateFormat(dateFormat);
@@ -96,34 +97,58 @@ class _DayWidgetState extends State<DayWidget> {
       height: MediaQuery.of(context).size.height / 3,
       child: SfCartesianChart(
           primaryXAxis: CategoryAxis(),
-          primaryYAxis:  widget.isPlant?NumericAxis(minimum: 0, maximum: maximumInterval, interval:maximumInterval/ 10):NumericAxis(minimum: 0, maximum: maximumInterval, interval: maximumInterval/10),
+          primaryYAxis: widget.isPlant
+              ? NumericAxis(
+                  minimum: 0,
+                  maximum: maximumInterval,
+                  interval: maximumInterval / 10)
+              : NumericAxis(
+                  minimum: 0,
+                  maximum: maximumInterval,
+                  interval: maximumInterval / 10),
           tooltipBehavior: _tooltip,
           zoomPanBehavior: zoomPanBehavior,
-          series: widget.isPlant?<ChartSeries<PlantPrefix.Response, String>>[
-            AreaSeries<PlantPrefix.Response, String>(
-                dataSource: plantData,
-                xValueMapper: (PlantPrefix.Response data, _) =>
-                    Utility().changeTimeFormate1(data.dDate),
-                yValueMapper: (PlantPrefix.Response data, _) =>  data.current_Energy,
-                borderDrawMode: BorderDrawMode.all,
-                borderColor: AppColor.themeColor,
-                borderWidth: 2,
-                markerSettings: MarkerSettings(isVisible: true,height: 3,width: 3,color: AppColor.themeColor,borderColor: AppColor.themeColor,borderWidth: 1),
-                name: 'Peak Energy',
-                color: AppColor.chartColour)
-          ]:<ChartSeries<DevicePrefix.Response, String>>[
-            AreaSeries<DevicePrefix.Response, String>(
-                dataSource: deviceData,
-                xValueMapper: (DevicePrefix.Response data, _) =>
-                  Utility().changeTimeFormate1(data.date1),
-                yValueMapper: (DevicePrefix.Response data, _) => data.currentRPower,
-                borderDrawMode: BorderDrawMode.top,
-                borderColor: AppColor.themeColor,
-                borderWidth: 2,
-                markerSettings: MarkerSettings(isVisible: true,height: 3,width: 3,color: AppColor.themeColor,borderColor: AppColor.themeColor,borderWidth: 1),
-                name: 'Peak Energy',
-                color: AppColor.chartColour)
-          ]),
+          series: widget.isPlant
+              ? <ChartSeries<PlantPrefix.Response, String>>[
+                  AreaSeries<PlantPrefix.Response, String>(
+                      dataSource: plantData,
+                      xValueMapper: (PlantPrefix.Response data, _) =>
+                          Utility().changeTimeFormate1(data.dDate),
+                      yValueMapper: (PlantPrefix.Response data, _) =>
+                          data.current_Energy,
+                      borderDrawMode: BorderDrawMode.all,
+                      borderColor: AppColor.themeColor,
+                      borderWidth: 2,
+                      markerSettings: MarkerSettings(
+                          isVisible: true,
+                          height: 3,
+                          width: 3,
+                          color: AppColor.themeColor,
+                          borderColor: AppColor.themeColor,
+                          borderWidth: 1),
+                      name: 'Peak Energy',
+                      color: AppColor.chartColour)
+                ]
+              : <ChartSeries<DevicePrefix.Response, String>>[
+                  AreaSeries<DevicePrefix.Response, String>(
+                      dataSource: deviceData,
+                      xValueMapper: (DevicePrefix.Response data, _) =>
+                          Utility().changeTimeFormate1(data.date1),
+                      yValueMapper: (DevicePrefix.Response data, _) =>
+                          data.currentRPower,
+                      borderDrawMode: BorderDrawMode.top,
+                      borderColor: AppColor.themeColor,
+                      borderWidth: 2,
+                      markerSettings: MarkerSettings(
+                          isVisible: true,
+                          height: 3,
+                          width: 3,
+                          color: AppColor.themeColor,
+                          borderColor: AppColor.themeColor,
+                          borderWidth: 1),
+                      name: 'Peak Energy',
+                      color: AppColor.chartColour)
+                ]),
     );
   }
 
@@ -277,11 +302,13 @@ class _DayWidgetState extends State<DayWidget> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                !widget.isPlant?robotoTextWidget(
-                    textval: '$currentPower:- $currentPowerTxt',
-                    colorval: AppColor.whiteColor,
-                    sizeval: 12,
-                    fontWeight: FontWeight.w600):SizedBox(),
+                !widget.isPlant
+                    ? robotoTextWidget(
+                        textval: '$currentPower:- $currentPowerTxt',
+                        colorval: AppColor.whiteColor,
+                        sizeval: 12,
+                        fontWeight: FontWeight.w600)
+                    : SizedBox(),
                 robotoTextWidget(
                     textval: '$address:- $plantAddress',
                     colorval: AppColor.whiteColor,
@@ -370,21 +397,20 @@ class _DayWidgetState extends State<DayWidget> {
     );
   }
 
-  Future<void> dailyDataAPI()  async {
+  Future<void> dailyDataAPI() async {
     if (mounted) {
       setState(() {
         isLoading = true;
       });
     }
-    if(widget.isPlant){
+    if (widget.isPlant) {
       plantDataAPI();
-    }else{
-
+    } else {
       DeviceDataAPI();
     }
   }
 
-  void DeviceDataAPI() async{
+  void DeviceDataAPI() async {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
     var outputFormat = DateFormat(dateFormat2);
@@ -395,22 +421,29 @@ class _DayWidgetState extends State<DayWidget> {
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
-      DevicePrefix.ChartData chartData =  DevicePrefix.ChartData.fromJson(jsonData);
-      if (chartData.status.toString() == 'true' && chartData.response.isNotEmpty) {
+      DevicePrefix.ChartData chartData =
+          DevicePrefix.ChartData.fromJson(jsonData);
+      if (chartData.status.toString() == 'true' &&
+          chartData.response.isNotEmpty) {
         deviceData = chartData.response;
 
-        plantAddress = chartData.response[chartData.response.length - 1].address;
+        plantAddress =
+            chartData.response[chartData.response.length - 1].address;
 
-        currentPowerTxt = '${chartData.response[chartData.response.length - 1].currentRPower.toStringAsFixed(2)} kWh';
+        currentPowerTxt =
+            '${chartData.response[chartData.response.length - 1].currentRPower.toStringAsFixed(2)} kWh';
 
-        totalEnergyTxt = '${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)} kWh';
+        totalEnergyTxt =
+            '${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)} kWh';
 
-        totalIncomeTxt = '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)}').toString()} INR';
+        totalIncomeTxt =
+            '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)}').toString()} INR';
 
-        todayEnergyTxt = '${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)} kWh';
+        todayEnergyTxt =
+            '${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)} kWh';
 
         todayIncomeTxt =
-        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)}').toString()} INR';
+            '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)}').toString()} INR';
 
         retriveDeviceMaxNumber(deviceData);
       }
@@ -427,7 +460,7 @@ class _DayWidgetState extends State<DayWidget> {
     }
   }
 
-  void plantDataAPI() async{
+  void plantDataAPI() async {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
     var outputFormat = DateFormat(dateFormat2);
@@ -438,22 +471,28 @@ class _DayWidgetState extends State<DayWidget> {
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
-      PlantPrefix.PlantChartData plantChartData =  PlantPrefix.PlantChartData.fromJson(jsonData);
-      if (plantChartData.status.toString() == 'true' && plantChartData.response.isNotEmpty) {
+      PlantPrefix.PlantChartData plantChartData =
+          PlantPrefix.PlantChartData.fromJson(jsonData);
+      if (plantChartData.status.toString() == 'true' &&
+          plantChartData.response.isNotEmpty) {
         plantData = plantChartData.response;
 
-        plantAddress = plantChartData.response[plantChartData.response.length - 1].address;
+        plantAddress =
+            plantChartData.response[plantChartData.response.length - 1].address;
 
-     //   currentPowerTxt = '${plantChartData.response[plantChartData.response.length - 1].currentRPower} kWh';
+        //   currentPowerTxt = '${plantChartData.response[plantChartData.response.length - 1].currentRPower} kWh';
 
-        totalEnergyTxt = '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)} kWh';
+        totalEnergyTxt =
+            '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)} kWh';
 
-        totalIncomeTxt = '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)}').toString()} INR';
+        totalIncomeTxt =
+            '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)}').toString()} INR';
 
-        todayEnergyTxt = '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)} kWh';
+        todayEnergyTxt =
+            '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)} kWh';
 
         todayIncomeTxt =
-        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)}').toString()} INR';
+            '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)}').toString()} INR';
         retrivePlantMaxNumber(plantData);
       }
 
@@ -469,7 +508,7 @@ class _DayWidgetState extends State<DayWidget> {
     }
   }
 
-  void retriveDeviceMaxNumber(List<DevicePrefix.Response>deviceData) {
+  void retriveDeviceMaxNumber(List<DevicePrefix.Response> deviceData) {
     var largestGeekValue = deviceData[0].currentRPower;
     var smallestGeekValue = deviceData[0].currentRPower;
 
@@ -477,20 +516,22 @@ class _DayWidgetState extends State<DayWidget> {
     // the largest and smallest
     // numbers in the list
     deviceData.forEach((gfg) => {
-      if (gfg.currentRPower > largestGeekValue) {largestGeekValue = gfg.currentRPower},
-      if (gfg.currentRPower < smallestGeekValue) {smallestGeekValue = gfg.currentRPower},
-    });
+          if (gfg.currentRPower > largestGeekValue)
+            {largestGeekValue = gfg.currentRPower},
+          if (gfg.currentRPower < smallestGeekValue)
+            {smallestGeekValue = gfg.currentRPower},
+        });
 
     // Printing the values
-   // print("Smallest value in the list : $smallestGeekValue");
-   // print("Largest value in the list : $largestGeekValue");
+    // print("Smallest value in the list : $smallestGeekValue");
+    // print("Largest value in the list : $largestGeekValue");
 
     maximumInterval = largestGeekValue;
 
     print('maximumInterval===>$maximumInterval');
   }
 
-  void retrivePlantMaxNumber(List<PlantPrefix.Response>plantData) {
+  void retrivePlantMaxNumber(List<PlantPrefix.Response> plantData) {
     var largestGeekValue = plantData[0].current_Energy;
     var smallestGeekValue = plantData[0].current_Energy;
 
@@ -498,16 +539,16 @@ class _DayWidgetState extends State<DayWidget> {
     // the largest and smallest
     // numbers in the list
     plantData.forEach((gfg) => {
-      if (gfg.current_Energy > largestGeekValue) {largestGeekValue = gfg.current_Energy},
-      if (gfg.current_Energy < smallestGeekValue) {smallestGeekValue = gfg.current_Energy},
-    });
+          if (gfg.current_Energy > largestGeekValue)
+            {largestGeekValue = gfg.current_Energy},
+          if (gfg.current_Energy < smallestGeekValue)
+            {smallestGeekValue = gfg.current_Energy},
+        });
 
     // Printing the values
-   // print("Smallest value in the list : $smallestGeekValue");
-   // print("Largest value in the list : $largestGeekValue");
+    // print("Smallest value in the list : $smallestGeekValue");
+    // print("Largest value in the list : $largestGeekValue");
 
     maximumInterval = largestGeekValue;
-
   }
-
 }
