@@ -91,7 +91,7 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
           return ListItem(index);
         },
         itemCount: deviceList.length,
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(9),
       ),
     );
   }
@@ -119,7 +119,7 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
             child: Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(5),
                 child: Stack(children: <Widget>[
                   Row(
                     children: [
@@ -143,7 +143,7 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
                         ),
                       ),
                       const SizedBox(
-                        width: 10,
+                        width: 7,
                       ),
 
                       Column(
@@ -167,7 +167,11 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
                         ],
                       ),
 
+                      SizedBox(
+                        height: 5,
+                      ),
                       Container(
+                        width: 30,
 
                         child:   GestureDetector(
                           onTap: (){
@@ -178,7 +182,7 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
                             );
 
                           },
-                          child: IconWidget('assets/svg/delete.svg',deletePlant),
+                          child: IconWidget('assets/svg/delete.svg' ,deletePlant),
                         ),
                       )
 

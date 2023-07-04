@@ -40,7 +40,7 @@ class _ChartWidgetState extends State<ChartWidget> {
                 onPressed: () => Navigator.of(context).pop(),
               ),
               backgroundColor: AppColor.themeColor,
-              title: robotoTextWidget(textval: deviceDetail, colorval: AppColor.whiteColor,
+              title: robotoTextWidget(textval: widget.isPlant?plantDetail:deviceDetail, colorval: AppColor.whiteColor,
                   sizeval: 18, fontWeight: FontWeight.normal),
               bottom:  TabBar(
                 isScrollable: false,
