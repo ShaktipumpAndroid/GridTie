@@ -18,6 +18,7 @@ var totalCapacity = "Total Capacity";
 var pageRefreshed = "Page Refreshed";
 var noDataFound ="No data found";
 var deviceDetail = "Device Detail";
+var plantDetail ="Plant Detail";
 var day = "Day";
 var month = "Month";
 var year = "Year";

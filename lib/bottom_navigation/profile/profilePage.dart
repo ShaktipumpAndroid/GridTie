@@ -121,7 +121,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   personalDetails() {
-    return SizedBox(
+    return Container(
+       margin: EdgeInsets.only(top: 10),
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height / 6,
       child: Column(
