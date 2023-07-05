@@ -526,7 +526,11 @@ class _DayWidgetState extends State<DayWidget> {
     // print("Smallest value in the list : $smallestGeekValue");
     // print("Largest value in the list : $largestGeekValue");
 
-    maximumInterval = largestGeekValue;
+    if(largestGeekValue == 0.0){
+      maximumInterval = 50;
+    }else{
+      maximumInterval = largestGeekValue;
+    }
 
     print('maximumInterval===>$maximumInterval');
   }
@@ -549,6 +553,15 @@ class _DayWidgetState extends State<DayWidget> {
     // print("Smallest value in the list : $smallestGeekValue");
     // print("Largest value in the list : $largestGeekValue");
 
-    maximumInterval = largestGeekValue;
+    if(largestGeekValue == 0.0){
+      maximumInterval = 50;
+    }else{
+      maximumInterval = largestGeekValue;
+    }
+
+
+
+    print('maximumInterval===>$largestGeekValue');
+
   }
 }
