@@ -58,14 +58,14 @@ class Response {
   });
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
-    totalREnergy: json["total_REnergy"]!=null?json["total_REnergy"]:0,
-    todayREnergy: json["today_REnergy"]!=null?json["today_REnergy"]?.round():0,
-    totalRCapacity: json["total_RCapacity"]!=null?json["total_RCapacity"]:0,
-    currentRPower: json["currentRPower"]!=null?json["currentRPower"]*10000:0,
-    address:json["address"]!=null&& json["address"].toString().isNotEmpty?json["address"]:"",
-    todayPEnergy: json["today_PEnergy"]!=null?json["today_PEnergy"]*10000:0,
-    totalPEnergy: json["total_PEnergy"]!=null?json["total_PEnergy"]*10000:0,
-    cPPower: json["cP_Power"]!=null?json["cP_Power"]:0.0,
+    totalREnergy: json["total_REnergy"]!="null"?json["total_REnergy"]:0,
+    todayREnergy: json["today_REnergy"]!="null"?json["today_REnergy"]?.round():0,
+    totalRCapacity: json["total_RCapacity"]!="null"?json["total_RCapacity"]:0,
+    currentRPower: json["currentRPower"]!="null"?json["currentRPower"]*10000:0,
+    address:json["address"]!="null"&& json["address"].toString().isNotEmpty?json["address"]:"",
+    todayPEnergy: json["today_PEnergy"]!="null"?json["today_PEnergy"]*10000:0,
+    totalPEnergy: json["total_PEnergy"]!="null"?json["total_PEnergy"]*10000:0,
+    cPPower: json["cP_Power"]!="null"?json["cP_Power"]:0.0,
     deviceNo: json["deviceNo"] ?? "",
     date1:json["date1"] ?? "",
   );

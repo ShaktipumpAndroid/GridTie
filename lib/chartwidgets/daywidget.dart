@@ -309,11 +309,11 @@ class _DayWidgetState extends State<DayWidget> {
                         sizeval: 12,
                         fontWeight: FontWeight.w600)
                     : SizedBox(),
-                robotoTextWidget(
+                plantAddress.isNotEmpty?robotoTextWidget(
                     textval: '$address:- $plantAddress',
                     colorval: AppColor.whiteColor,
                     sizeval: 12,
-                    fontWeight: FontWeight.w600)
+                    fontWeight: FontWeight.w600):SizedBox()
               ]),
         )
       ]),
@@ -430,6 +430,8 @@ class _DayWidgetState extends State<DayWidget> {
         plantAddress =
             chartData.response[chartData.response.length - 1].address;
 
+
+
         currentPowerTxt =
             '${chartData.response[chartData.response.length - 1].currentRPower.toStringAsFixed(2)} kWh';
 
@@ -480,6 +482,7 @@ class _DayWidgetState extends State<DayWidget> {
         plantAddress =
             plantChartData.response[plantChartData.response.length - 1].address;
 
+        print("plantAddress====>${plantAddress}");
         //   currentPowerTxt = '${plantChartData.response[plantChartData.response.length - 1].currentRPower} kWh';
 
         totalEnergyTxt =
@@ -526,7 +529,7 @@ class _DayWidgetState extends State<DayWidget> {
     // print("Smallest value in the list : $smallestGeekValue");
     // print("Largest value in the list : $largestGeekValue");
 
-    if(largestGeekValue == 0.0){
+    if(largestGeekValue == 0.0||largestGeekValue==0){
       maximumInterval = 50;
     }else{
       maximumInterval = largestGeekValue;
@@ -553,7 +556,7 @@ class _DayWidgetState extends State<DayWidget> {
     // print("Smallest value in the list : $smallestGeekValue");
     // print("Largest value in the list : $largestGeekValue");
 
-    if(largestGeekValue == 0.0){
+    if(largestGeekValue == 0.0 || largestGeekValue==0){
       maximumInterval = 50;
     }else{
       maximumInterval = largestGeekValue;
