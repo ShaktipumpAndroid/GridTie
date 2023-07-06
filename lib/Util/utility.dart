@@ -99,7 +99,7 @@ class Utility {
     var inputFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
     var inputDate = inputFormat.parse(date); // <-- dd/MM 24H format
 
-    var outputFormat = DateFormat('hh:mm');
+    var outputFormat = DateFormat('HH:mm');
     var outputDate = outputFormat.format(inputDate);
 
     return outputDate;
