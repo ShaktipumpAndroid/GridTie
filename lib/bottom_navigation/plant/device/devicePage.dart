@@ -52,8 +52,8 @@ class _DevicePageState extends State<DevicePage> {
             body:    TabBarView(
               physics: NeverScrollableScrollPhysics(),
               children: [
-                DeviceListPage(plantId: widget.plantId,status:"0"),
                 DeviceListPage(plantId: widget.plantId,status:"1"),
+                DeviceListPage(plantId: widget.plantId,status:"0"),
 
               ],
             ),

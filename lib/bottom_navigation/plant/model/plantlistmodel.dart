@@ -23,6 +23,7 @@ class PlantListModel {
     status: json["status"],
     message: json["message"],
     response: json["response"]!=null?List<Response>.from(json["response"].map((x) => Response.fromJson(x))):[],
+
   );
 
   Map<String, dynamic> toJson() => {
@@ -33,69 +34,61 @@ class PlantListModel {
 }
 
 class Response {
-  int pid;
-  String plantName;
-  String plantAddress;
-  int createdDate;
-  String latitude;
-  String longitude;
-  dynamic muid;
-  String capacity;
   String plantType;
   bool status;
-  dynamic totalEnergy;
-  dynamic todayEnergy;
-  dynamic islogin;
   bool favPlant;
+  String latitude;
+  String longitude;
+  String capacity;
+  int pid;
+  bool isActive;
+  String plantName;
+  DateTime createdDate;
+  String plantAddress;
+  dynamic muId;
 
   Response({
-    required this.pid,
-    required this.plantName,
-    required this.plantAddress,
-    required this.createdDate,
-    required this.latitude,
-    required this.longitude,
-    this.muid,
-    required this.capacity,
     required this.plantType,
     required this.status,
-    this.totalEnergy,
-    this.todayEnergy,
-    this.islogin,
     required this.favPlant,
+    required this.latitude,
+    required this.longitude,
+    required this.capacity,
+    required this.pid,
+    required this.isActive,
+    required this.plantName,
+    required this.createdDate,
+    required this.plantAddress,
+    this.muId,
   });
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
-    pid: json["pid"],
-    plantName: json["plantName"],
-    plantAddress: json["plantAddress"],
-    createdDate: json["createdDate"],
-    latitude: json["latitude"],
-    longitude: json["longitude"],
-    muid: json["muid"],
-    capacity: json["capacity"],
     plantType: json["plant_type"],
     status: json["status"],
-    totalEnergy: json["totalEnergy"],
-    todayEnergy: json["todayEnergy"],
-    islogin: json["islogin"],
-    favPlant: json["favPlant"],
+    favPlant: json["fav_Plant"],
+    latitude: json["latitude"],
+    longitude: json["longitude"],
+    capacity: json["capacity"],
+    pid: json["pid"],
+    isActive: json["isActive"],
+    plantName: json["plantName"],
+    createdDate: DateTime.parse(json["createdDate"]),
+    plantAddress: json["plantAddress"],
+    muId: json["muId"],
   );
 
   Map<String, dynamic> toJson() => {
-    "pid": pid,
-    "plantName": plantName,
-    "plantAddress": plantAddress,
-    "createdDate": createdDate,
-    "latitude": latitude,
-    "longitude": longitude,
-    "muid": muid,
-    "capacity": capacity,
     "plant_type": plantType,
     "status": status,
-    "totalEnergy": totalEnergy,
-    "todayEnergy": todayEnergy,
-    "islogin": islogin,
-    "favPlant": favPlant,
+    "fav_Plant": favPlant,
+    "latitude": latitude,
+    "longitude": longitude,
+    "capacity": capacity,
+    "pid": pid,
+    "isActive": isActive,
+    "plantName": plantName,
+    "createdDate": createdDate.toIso8601String(),
+    "plantAddress": plantAddress,
+    "muId": muId,
   };
 }
