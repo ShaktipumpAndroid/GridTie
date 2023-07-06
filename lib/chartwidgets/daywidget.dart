@@ -97,11 +97,7 @@ class _DayWidgetState extends State<DayWidget> {
       height: MediaQuery.of(context).size.height / 3,
       child: SfCartesianChart(
           primaryXAxis: CategoryAxis(),
-          primaryYAxis: widget.isPlant
-              ? NumericAxis(
-                  minimum: 0,
-                  maximum: maximumInterval,
-                  interval: maximumInterval / 10)
+          primaryYAxis: widget.isPlant ? NumericAxis(minimum: 0, maximum: maximumInterval, interval: maximumInterval / 10)
               : NumericAxis(
                   minimum: 0,
                   maximum: maximumInterval,
@@ -119,7 +115,7 @@ class _DayWidgetState extends State<DayWidget> {
                       borderDrawMode: BorderDrawMode.all,
                       borderColor: AppColor.themeColor,
                       borderWidth: 2,
-                      markerSettings: MarkerSettings(
+                      markerSettings: const MarkerSettings(
                           isVisible: true,
                           height: 3,
                           width: 3,
@@ -139,7 +135,7 @@ class _DayWidgetState extends State<DayWidget> {
                       borderDrawMode: BorderDrawMode.top,
                       borderColor: AppColor.themeColor,
                       borderWidth: 2,
-                      markerSettings: MarkerSettings(
+                      markerSettings: const MarkerSettings(
                           isVisible: true,
                           height: 3,
                           width: 3,
@@ -160,7 +156,7 @@ class _DayWidgetState extends State<DayWidget> {
         children: [
           IconButton(
             onPressed: () {
-              DateTime date = SelectedDate.subtract(Duration(days: 1));
+              DateTime date = SelectedDate.subtract(const Duration(days: 1));
               if (date.year > 2017) {
                 var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
                 SelectedDate = inputFormat.parse(
@@ -213,7 +209,7 @@ class _DayWidgetState extends State<DayWidget> {
           ),
           IconButton(
             onPressed: () {
-              DateTime date = SelectedDate.add(Duration(days: 1));
+              DateTime date = SelectedDate.add(const Duration(days: 1));
               var inputFormat = DateFormat('dd/MM/yyyy');
               SelectedDate =
                   inputFormat.parse("${DateFormat('dd/MM/yyyy').format(date)}");
@@ -308,12 +304,14 @@ class _DayWidgetState extends State<DayWidget> {
                         colorval: AppColor.whiteColor,
                         sizeval: 12,
                         fontWeight: FontWeight.w600)
-                    : SizedBox(),
-                robotoTextWidget(
-                    textval: '$address:- $plantAddress',
-                    colorval: AppColor.whiteColor,
-                    sizeval: 12,
-                    fontWeight: FontWeight.w600)
+                    : const SizedBox(),
+                plantAddress.isNotEmpty
+                    ? robotoTextWidget(
+                        textval: '$address:- $plantAddress',
+                        colorval: AppColor.whiteColor,
+                        sizeval: 12,
+                        fontWeight: FontWeight.w600)
+                    : const SizedBox()
               ]),
         )
       ]),
@@ -324,7 +322,7 @@ class _DayWidgetState extends State<DayWidget> {
     return Wrap(
       children: [
         Container(
-          margin: EdgeInsets.only(top: 20, bottom: 20),
+          margin: const EdgeInsets.only(top: 20, bottom: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -425,6 +423,7 @@ class _DayWidgetState extends State<DayWidget> {
           DevicePrefix.ChartData.fromJson(jsonData);
       if (chartData.status.toString() == 'true' &&
           chartData.response.isNotEmpty) {
+        print('deviceData$deviceData');
         deviceData = chartData.response;
 
         plantAddress =
@@ -480,7 +479,6 @@ class _DayWidgetState extends State<DayWidget> {
         plantAddress =
             plantChartData.response[plantChartData.response.length - 1].address;
 
-        //   currentPowerTxt = '${plantChartData.response[plantChartData.response.length - 1].currentRPower} kWh';
 
         totalEnergyTxt =
             '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)} kWh';
@@ -526,7 +524,11 @@ class _DayWidgetState extends State<DayWidget> {
     // print("Smallest value in the list : $smallestGeekValue");
     // print("Largest value in the list : $largestGeekValue");
 
-    maximumInterval = largestGeekValue;
+    if(largestGeekValue == 0.0||largestGeekValue==0){
+      maximumInterval = 50;
+    }else{
+      maximumInterval = largestGeekValue;
+    }
 
     print('maximumInterval===>$maximumInterval');
   }
@@ -549,6 +551,15 @@ class _DayWidgetState extends State<DayWidget> {
     // print("Smallest value in the list : $smallestGeekValue");
     // print("Largest value in the list : $largestGeekValue");
 
-    maximumInterval = largestGeekValue;
+    if(largestGeekValue == 0.0 || largestGeekValue==0){
+      maximumInterval = 50;
+    }else{
+      maximumInterval = largestGeekValue;
+    }
+
+
+
+    print('maximumInterval===>$largestGeekValue');
+
   }
 }

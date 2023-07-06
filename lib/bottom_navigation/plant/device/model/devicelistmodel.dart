@@ -22,7 +22,8 @@ class DeviceListModel {
   factory DeviceListModel.fromJson(Map<String, dynamic> json) => DeviceListModel(
     status: json["status"],
     message: json["message"],
-    response: List<Response>.from(json["response"].map((x) => Response.fromJson(x))),
+    response: json["response"]!=null?List<Response>.from(json["response"].map((x) => Response.fromJson(x))):[],
+
   );
 
   Map<String, dynamic> toJson() => {
@@ -56,15 +57,15 @@ class Response {
   });
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
-    deviceNo: json["deviceNo"],
-    inverterType: json["inverterType"],
-    model: json["model"],
-    plantName: json["plantName"],
-    courrentPower: json["courrentPower"],
-    eTotal: json["eTotal"],
-    status: json["status"],
-    remark: json["remark"],
-    todayEnergy: json["today_energy"],
+    deviceNo: json["deviceNo"] != null?json["deviceNo"]:"",
+    inverterType: json["inverterType"] ?? "",
+    model: json["model"] != 0.0?json["model"]:"",
+    plantName: json["plantName"] ?? "",
+    courrentPower: json["courrentPower"] ?? "",
+    eTotal: json["eTotal"] ?? "",
+    status: json["status"] ?? "",
+    remark: json["remark"] ?? "",
+    todayEnergy: json["today_energy"] ?? "",
   );
 
   Map<String, dynamic> toJson() => {

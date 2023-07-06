@@ -202,8 +202,7 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
     dynamic res = await HTTP.get(getDeviceList(
-        sharedPreferences.getString(userID).toString(),
-        widget.status,
+        sharedPreferences.getString(userID).toString(),widget.status,
         widget.plantId));
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
