@@ -255,11 +255,11 @@ class _MonthWidgetState extends State<MonthWidget> {
                     colorval: AppColor.whiteColor,
                     sizeval: 12,
                     fontWeight: FontWeight.w600):SizedBox(),
-                robotoTextWidget(
+                plantAddress.isNotEmpty?robotoTextWidget(
                     textval: '$address:- $plantAddress',
                     colorval: AppColor.whiteColor,
                     sizeval: 12,
-                    fontWeight: FontWeight.w600)
+                    fontWeight: FontWeight.w600):SizedBox()
               ]),
         )
       ]),

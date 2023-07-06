@@ -57,9 +57,9 @@ class Response {
   });
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
-    deviceNo: json["deviceNo"] ?? "",
+    deviceNo: json["deviceNo"] != null?json["deviceNo"]:"",
     inverterType: json["inverterType"] ?? "",
-    model: json["model"],
+    model: json["model"] != 0.0?json["model"]:"",
     plantName: json["plantName"] ?? "",
     courrentPower: json["courrentPower"] ?? "",
     eTotal: json["eTotal"] ?? "",
