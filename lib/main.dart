@@ -1,4 +1,5 @@
 import 'dart:convert' as convert;
+import 'package:flutter/services.dart';
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 
 import 'package:flutter/material.dart';
@@ -20,7 +21,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   String? isLoggedIn = (prefs.getString(userID) == null) ? 'false' : 'true';
-  runApp(MyApp(isLoggedIn: isLoggedIn));
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_){
+    runApp(MyApp(isLoggedIn: isLoggedIn));
+  });
+
 }
 
 class MyApp extends StatelessWidget {

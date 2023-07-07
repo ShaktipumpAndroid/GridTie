@@ -2,6 +2,9 @@ import 'dart:convert' as convert;
 
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:grid_tie/chartwidgets/chartfullscreen.dart';
 import 'package:grid_tie/chartwidgets/model/chartdata.dart' as DevicePrefix;
 import 'package:grid_tie/chartwidgets/model/plantchartdata.dart' as PlantPrefix;
 import 'package:grid_tie/uiwidget/robotoTextWidget.dart';
@@ -77,17 +80,18 @@ class _DayWidgetState extends State<DayWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Stack(children: [
-      SingleChildScrollView(
+          SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
               datePickerWidget(),
               areaChart(),
+              (plantData.isNotEmpty||deviceData.isNotEmpty)?rotateWidget():SizedBox(),
               plantDetailWidget(),
               solarHouseDetailWidget(),
             ],
           )),
-      isLoading ? Utility().dialogueWidget(context) : const SizedBox(),
+          isLoading ? Utility().dialogueWidget(context) : const SizedBox(),
     ]));
   }
 
@@ -322,7 +326,7 @@ class _DayWidgetState extends State<DayWidget> {
     return Wrap(
       children: [
         Container(
-          margin: const EdgeInsets.only(top: 20, bottom: 20),
+          margin: const EdgeInsets.only(top: 10, bottom: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -562,4 +566,45 @@ class _DayWidgetState extends State<DayWidget> {
     print('maximumInterval===>$largestGeekValue');
 
   }
+
+  rotateWidget() {
+    return Container(
+      width: double.infinity,
+      height: 28,
+      margin: EdgeInsets.only(right: 10),
+      child: InkWell(
+        onTap: () {
+          SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      ChartFullScreen( isPlant: widget.isPlant, maximumInterval: maximumInterval, deviceData: deviceData ,plantData: plantData,)),
+                  (Route<dynamic> route) => true);
+
+        },
+        child: IconWidget('assets/svg/fullscreen.svg', viewfullscreen),
+      ),
+    );
+  }
+
+}
+
+Row IconWidget(String svg, String txt) {
+  return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        robotoTextWidget(
+            textval: txt,
+            colorval: AppColor.blackColor,
+            sizeval: 12,
+            fontWeight: FontWeight.bold),
+        SizedBox(width: 5,),
+        SvgPicture.asset(
+          svg,
+          width: 20,
+          height: 20,
+        ),
+      ],
+    );
 }
