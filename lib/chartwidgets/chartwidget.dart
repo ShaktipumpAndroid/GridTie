@@ -55,7 +55,7 @@ class _ChartWidgetState extends State<ChartWidget> {
           body:   TabBarView(
             physics: NeverScrollableScrollPhysics(),
             children: [
-             DayWidget(deviceId: widget.deviceId,isPlant: widget.isPlant,),
+              DayWidget(deviceId: widget.deviceId,isPlant: widget.isPlant,),
               MonthWidget(deviceId: widget.deviceId,isPlant: widget.isPlant,),
               YearWidget(deviceId: widget.deviceId,isPlant: widget.isPlant,),
             ],
