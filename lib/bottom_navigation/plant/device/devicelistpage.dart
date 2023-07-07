@@ -34,16 +34,8 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
   void initState() {
     // TODO: implement initState
     super.initState();
-
     retrieveDeviceList();
   }
-
-  @override
-  void dispose() {
-
-    super.dispose();
-  }
-
 
   @override
   void setState(fn) {
@@ -91,7 +83,7 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
           return ListItem(index);
         },
         itemCount: deviceList.length,
-        padding: const EdgeInsets.all(9),
+        padding: const EdgeInsets.all(5),
       ),
     );
   }
@@ -149,14 +141,18 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                           robotoTextWidget(
-                            textval: deviceList[index].inverterType,
-                            colorval: AppColor.blackColor,
-                            sizeval: 14.0,
-                            fontWeight: FontWeight.w600,
+                          Container(
+                            width:MediaQuery.of(context).size.width/1.42,
+                            height: 30,
+                            child: robotoTextWidget(
+                              textval: deviceList[index].inverterType,
+                              colorval: AppColor.blackColor,
+                              sizeval: 14.0,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           const SizedBox(
-                            height: 5,
+                            height: 2,
                           ),
                          robotoTextWidget(
                             textval: deviceList[index].deviceNo,
@@ -173,7 +169,7 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
                       Container(
                         width: 30,
 
-                        child:   GestureDetector(
+                        child: GestureDetector(
                           onTap: (){
                             selectedIndex = index;
                             showDialog(
@@ -232,8 +228,6 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
     );
   }
 
-
-
   SizedBox NoDataFound() {
     return SizedBox(
         height: MediaQuery.of(context).size.height,
@@ -279,7 +273,6 @@ class _DeviceListPageState extends State<DeviceListPage>with WidgetsBindingObser
       ),
     );
   }
-
 
   Widget dialogue_removeDevice(BuildContext context) {
 

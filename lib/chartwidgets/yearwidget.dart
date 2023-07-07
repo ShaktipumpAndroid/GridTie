@@ -1,6 +1,9 @@
 import 'dart:convert' as convert;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:grid_tie/chartwidgets/chartfullscreen.dart';
 import 'package:grid_tie/webservice/HTTP.dart' as HTTP;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,8 +18,11 @@ import '../webservice/constant.dart';
 import 'package:grid_tie/chartwidgets/model/chartdata.dart' as DevicePrefix;
 import 'package:grid_tie/chartwidgets/model/plantchartdata.dart' as PlantPrefix;
 
+import 'yearlychartfullscreen.dart';
+
 class YearWidget extends StatefulWidget {
-  YearWidget({Key? key, required this.deviceId,required this.isPlant}) : super(key: key);
+  YearWidget({Key? key, required this.deviceId, required this.isPlant})
+      : super(key: key);
   String deviceId;
   bool isPlant;
 
@@ -37,7 +43,7 @@ class _YearWidgetState extends State<YearWidget> {
       plantAddress = "",
       currentPowerTxt = "",
       totalEnergyTxt = "",
-      todayEnergyTxt ="",
+      todayEnergyTxt = "",
       totalCapacityTxt = "",
       totalIncomeTxt = "",
       todayIncomeTxt = "",
@@ -49,13 +55,15 @@ class _YearWidgetState extends State<YearWidget> {
   double maximumInterval = 50;
   late ZoomPanBehavior zoomPanBehavior;
 
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    _tooltip = TooltipBehavior(enable: true,  format: "point.y kWh",);
+    _tooltip = TooltipBehavior(
+      enable: true,
+      format: "point.y kWh",
+    );
     mindatime = DateTime.now();
     SelectedDate = mindatime;
     var outputFormat = DateFormat(dateFormat);
@@ -87,6 +95,9 @@ class _YearWidgetState extends State<YearWidget> {
             children: [
               datePickerWidget(),
               columnChart(),
+              (plantData.isNotEmpty || deviceData.isNotEmpty)
+                  ? rotateWidget()
+                  : SizedBox(),
               plantDetailWidget(),
               solarHouseDetailWidget(),
             ],
@@ -102,26 +113,38 @@ class _YearWidgetState extends State<YearWidget> {
         margin: const EdgeInsets.only(left: 20, right: 20),
         child: SfCartesianChart(
             primaryXAxis: CategoryAxis(),
-            primaryYAxis:  widget.isPlant?NumericAxis(minimum: 0, maximum: maximumInterval, interval:maximumInterval/ 10):NumericAxis(minimum: 0, maximum: maximumInterval, interval: maximumInterval/10),
+            primaryYAxis: widget.isPlant
+                ? NumericAxis(
+                    minimum: 0,
+                    maximum: maximumInterval,
+                    interval: maximumInterval / 10)
+                : NumericAxis(
+                    minimum: 0,
+                    maximum: maximumInterval,
+                    interval: maximumInterval / 10),
             tooltipBehavior: _tooltip,
             zoomPanBehavior: zoomPanBehavior,
-            series: widget.isPlant?<ChartSeries<PlantPrefix.Response, String>>[
-              ColumnSeries<PlantPrefix.Response, String>(
-                  dataSource: plantData,
-                  xValueMapper: (PlantPrefix.Response data, _) =>
-                      Utility().changeMonthFormate(data.dDate),
-                  yValueMapper: (PlantPrefix.Response data, _) => data.totalMEnergy,
-                  name: 'Peak Energy',
-                  color: AppColor.chartColour)
-            ]:<ChartSeries<DevicePrefix.Response, String>>[
-              ColumnSeries<DevicePrefix.Response, String>(
-                  dataSource: deviceData,
-                  xValueMapper: (DevicePrefix.Response data, _) =>
-                      Utility().changeMonthFormate(data.date1),
-                  yValueMapper: (DevicePrefix.Response data, _) => data.todayREnergy,
-                  name: 'Peak Energy',
-                  color: AppColor.chartColour)
-            ]));
+            series: widget.isPlant
+                ? <ChartSeries<PlantPrefix.Response, String>>[
+                    ColumnSeries<PlantPrefix.Response, String>(
+                        dataSource: plantData,
+                        xValueMapper: (PlantPrefix.Response data, _) =>
+                            Utility().changeMonthFormate(data.dDate),
+                        yValueMapper: (PlantPrefix.Response data, _) =>
+                            data.totalMEnergy,
+                        name: 'Peak Energy',
+                        color: AppColor.chartColour)
+                  ]
+                : <ChartSeries<DevicePrefix.Response, String>>[
+                    ColumnSeries<DevicePrefix.Response, String>(
+                        dataSource: deviceData,
+                        xValueMapper: (DevicePrefix.Response data, _) =>
+                            Utility().changeMonthFormate(data.date1),
+                        yValueMapper: (DevicePrefix.Response data, _) =>
+                            data.todayREnergy,
+                        name: 'Peak Energy',
+                        color: AppColor.chartColour)
+                  ]));
   }
 
   datePickerWidget() {
@@ -240,16 +263,20 @@ class _YearWidgetState extends State<YearWidget> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                !widget.isPlant?robotoTextWidget(
-                    textval: '$currentPower:- $currentPowerTxt',
-                    colorval: AppColor.whiteColor,
-                    sizeval: 12,
-                    fontWeight: FontWeight.w600):SizedBox(),
-                plantAddress.isNotEmpty?robotoTextWidget(
-                    textval: '$address:- $plantAddress',
-                    colorval: AppColor.whiteColor,
-                    sizeval: 12,
-                    fontWeight: FontWeight.w600):SizedBox()
+                !widget.isPlant
+                    ? robotoTextWidget(
+                        textval: '$currentPower:- $currentPowerTxt',
+                        colorval: AppColor.whiteColor,
+                        sizeval: 12,
+                        fontWeight: FontWeight.w600)
+                    : SizedBox(),
+                plantAddress.isNotEmpty
+                    ? robotoTextWidget(
+                        textval: '$address:- $plantAddress',
+                        colorval: AppColor.whiteColor,
+                        sizeval: 12,
+                        fontWeight: FontWeight.w600)
+                    : SizedBox()
               ]),
         )
       ]),
@@ -260,7 +287,7 @@ class _YearWidgetState extends State<YearWidget> {
     return Wrap(
       children: [
         Container(
-          margin: EdgeInsets.only(top: 20, bottom: 20),
+          margin: EdgeInsets.only(top: 10, bottom: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -278,7 +305,7 @@ class _YearWidgetState extends State<YearWidget> {
                       detailBoxWidget(totalIncome, totalIncomeTxt.toString()),
                     ],
                   ),
-                 /* Container(
+                  /* Container(
                     margin: const EdgeInsets.all(20),
                     height: 1,
                     color: AppColor.grey,
@@ -339,16 +366,16 @@ class _YearWidgetState extends State<YearWidget> {
         isLoading = true;
       });
     }
-    if(widget.isPlant){
+    if (widget.isPlant) {
       plantDataAPI();
-    }else{
+    } else {
       DeviceDataAPI();
     }
   }
 
-  void DeviceDataAPI() async{
+  void DeviceDataAPI() async {
     final SharedPreferences sharedPreferences =
-    await SharedPreferences.getInstance();
+        await SharedPreferences.getInstance();
 
     dynamic res = await HTTP.get(getYearlyDeviceChart(
         sharedPreferences.getString(userID).toString(),
@@ -358,32 +385,33 @@ class _YearWidgetState extends State<YearWidget> {
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
-      DevicePrefix.ChartData chartData = DevicePrefix.ChartData.fromJson(jsonData);
-      if (chartData.status.toString() == 'true'&& chartData.response.isNotEmpty) {
+      DevicePrefix.ChartData chartData =
+          DevicePrefix.ChartData.fromJson(jsonData);
+      if (chartData.status.toString() == 'true' &&
+          chartData.response.isNotEmpty) {
         deviceData = chartData.response;
 
         plantAddress =
             chartData.response[chartData.response.length - 1].address;
 
         totalCapacityTxt =
-        '${chartData.response[chartData.response.length - 1].totalRCapacity.toStringAsFixed(2)}';
+            '${chartData.response[chartData.response.length - 1].totalRCapacity.toStringAsFixed(2)}';
 
         currentPowerTxt =
-        '${chartData.response[chartData.response.length - 1].currentRPower.toStringAsFixed(2)} kWh';
+            '${chartData.response[chartData.response.length - 1].currentRPower.toStringAsFixed(2)} kWh';
 
         totalEnergyTxt =
-        '${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)} kWh';
+            '${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)} kWh';
 
         totalIncomeTxt =
-        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)}').toString()} INR';
+            '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].totalREnergy.toStringAsFixed(2)}').toString()} INR';
 
         todayEnergyTxt =
-        '${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)} kWh';
+            '${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)} kWh';
         todayIncomeTxt =
-        '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)}').toString()} INR';
+            '${Utility().calculateRevenue('${chartData.response[chartData.response.length - 1].todayREnergy.toStringAsFixed(2)}').toString()} INR';
 
         retriveDeviceMaxNumber(deviceData);
-
       }
 
       setState(() {
@@ -398,9 +426,9 @@ class _YearWidgetState extends State<YearWidget> {
     }
   }
 
-  void plantDataAPI() async{
+  void plantDataAPI() async {
     final SharedPreferences sharedPreferences =
-    await SharedPreferences.getInstance();
+        await SharedPreferences.getInstance();
 
     dynamic res = await HTTP.get(getYearlyPlantChart(
         sharedPreferences.getString(userID).toString(),
@@ -410,29 +438,31 @@ class _YearWidgetState extends State<YearWidget> {
     var jsonData = null;
     if (res != null && res.statusCode != null && res.statusCode == 200) {
       jsonData = convert.jsonDecode(res.body);
-      PlantPrefix.PlantChartData plantChartData = PlantPrefix.PlantChartData.fromJson(jsonData);
-      if (plantChartData.status.toString() == 'true'&& plantChartData.response.isNotEmpty) {
+      PlantPrefix.PlantChartData plantChartData =
+          PlantPrefix.PlantChartData.fromJson(jsonData);
+      if (plantChartData.status.toString() == 'true' &&
+          plantChartData.response.isNotEmpty) {
         plantData = plantChartData.response;
 
         plantAddress =
             plantChartData.response[plantChartData.response.length - 1].address;
 
         totalCapacityTxt =
-        '${plantChartData.response[plantChartData.response.length - 1].totalPCapacity.toStringAsFixed(2)}';
+            '${plantChartData.response[plantChartData.response.length - 1].totalPCapacity.toStringAsFixed(2)}';
 
-     /*   currentPowerTxt =
+        /*   currentPowerTxt =
         '${plantChartData.response[plantChartData.response.length - 1].currentRPower} kWh';*/
 
         totalEnergyTxt =
-        '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)} kWh';
+            '${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)} kWh';
 
         totalIncomeTxt =
-        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)}').toString()} INR';
+            '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalMEnergy.toStringAsFixed(2)}').toString()} INR';
 
         todayEnergyTxt =
-        '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)} kWh';
+            '${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)} kWh';
         todayIncomeTxt =
-        '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)}').toString()} INR';
+            '${Utility().calculateRevenue('${plantChartData.response[plantChartData.response.length - 1].totalDEnergy.toStringAsFixed(2)}').toString()} INR';
 
         retrivePlantMaxNumber(plantData);
       }
@@ -447,9 +477,9 @@ class _YearWidgetState extends State<YearWidget> {
         });
       }
     }
-
   }
-  void retriveDeviceMaxNumber(List<DevicePrefix.Response>deviceData) {
+
+  void retriveDeviceMaxNumber(List<DevicePrefix.Response> deviceData) {
     var largestGeekValue = deviceData[0].todayREnergy;
     var smallestGeekValue = deviceData[0].todayREnergy;
 
@@ -457,19 +487,20 @@ class _YearWidgetState extends State<YearWidget> {
     // the largest and smallest
     // numbers in the list
     deviceData.forEach((gfg) => {
-      if (gfg.todayREnergy > largestGeekValue) {largestGeekValue = gfg.todayREnergy},
-      if (gfg.todayREnergy < smallestGeekValue) {smallestGeekValue = gfg.todayREnergy},
-    });
+          if (gfg.todayREnergy > largestGeekValue)
+            {largestGeekValue = gfg.todayREnergy},
+          if (gfg.todayREnergy < smallestGeekValue)
+            {smallestGeekValue = gfg.todayREnergy},
+        });
 
     // Printing the values
-   // print("Smallest value in the list : $smallestGeekValue");
-  //  print("Largest value in the list : $largestGeekValue");
+    // print("Smallest value in the list : $smallestGeekValue");
+    //  print("Largest value in the list : $largestGeekValue");
 
-    maximumInterval = largestGeekValue+2;
-
+    maximumInterval = largestGeekValue + 2;
   }
 
-  void retrivePlantMaxNumber(List<PlantPrefix.Response>plantData) {
+  void retrivePlantMaxNumber(List<PlantPrefix.Response> plantData) {
     var largestGeekValue = plantData[0].totalMEnergy;
     var smallestGeekValue = plantData[0].totalMEnergy;
 
@@ -477,17 +508,62 @@ class _YearWidgetState extends State<YearWidget> {
     // the largest and smallest
     // numbers in the list
     plantData.forEach((gfg) => {
-      if (gfg.totalMEnergy > largestGeekValue) {largestGeekValue = gfg.totalMEnergy},
-      if (gfg.totalMEnergy < smallestGeekValue) {smallestGeekValue = gfg.totalMEnergy},
-    });
+          if (gfg.totalMEnergy > largestGeekValue)
+            {largestGeekValue = gfg.totalMEnergy},
+          if (gfg.totalMEnergy < smallestGeekValue)
+            {smallestGeekValue = gfg.totalMEnergy},
+        });
 
     // Printing the values
-   // print("Smallest value in the list : $smallestGeekValue");
-   // print("Largest value in the list : $largestGeekValue");
+    // print("Smallest value in the list : $smallestGeekValue");
+    // print("Largest value in the list : $largestGeekValue");
 
-    maximumInterval = largestGeekValue+2;
-
+    maximumInterval = largestGeekValue + 2;
   }
 
+  rotateWidget() {
+    return Container(
+      width: double.infinity,
+      height: 28,
+      margin: EdgeInsets.only(right: 10),
+      child: InkWell(
+        onTap: () {
+          SystemChrome.setPreferredOrientations(
+              [DeviceOrientation.landscapeLeft]);
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => YChartFullScreen(
+                        isPlant: widget.isPlant,
+                        maximumInterval: maximumInterval,
+                        deviceData: deviceData,
+                        plantData: plantData,
+                      )),
+              (Route<dynamic> route) => true);
+        },
+        child: IconWidget('assets/svg/fullscreen.svg', viewfullscreen),
+      ),
+    );
+  }
 
+  Row IconWidget(String svg, String txt) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        robotoTextWidget(
+            textval: txt,
+            colorval: AppColor.blackColor,
+            sizeval: 12,
+            fontWeight: FontWeight.bold),
+        SizedBox(
+          width: 5,
+        ),
+        SvgPicture.asset(
+          svg,
+          width: 20,
+          height: 20,
+        ),
+      ],
+    );
+  }
 }
